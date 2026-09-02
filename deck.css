@@ -1,0 +1,2730 @@
+/* ═══ Paleta de Codex (las 41 variables --color-*, extraídas del bootstrap real) ═══ */
+:root {
+  --color-blue-100: #BFE7F4;
+  --color-blue-200: #99D9ED;
+  --color-blue-300: #66BBD6;
+  --color-blue-400: #339EC0;
+  --color-blue-50: #E5F5FB;
+  --color-blue-500: #0080A9;
+  --color-blue-600: #007094;
+  --color-blue-700: #00607F;
+  --color-blue-800: #004054;
+  --color-blue-900: #001A22;
+  --color-gray-100: #E3E3E3;
+  --color-gray-200: #CCCCCC;
+  --color-gray-300: #ADADAD;
+  --color-gray-400: #666666;
+  --color-gray-50: #F5F5F5;
+  --color-gray-500: #4F4F4F;
+  --color-gray-600: #2C2C2C;
+  --color-gray-700: #242424;
+  --color-gray-800: #151515;
+  --color-gray-900: #000000;
+  --color-green-100: #DCEBDC;
+  --color-green-300: #95C497;
+  --color-green-500: #4F9D52;
+  --color-green-700: #2F5E31;
+  --color-green-800: #203F21;
+  --color-red-100: #F6DEDD;
+  --color-red-200: #EDCECA;
+  --color-red-300: #EEA499;
+  --color-red-400: #DC4F4C;
+  --color-red-50: #FFF1F1;
+  --color-red-500: #D41B00;
+  --color-red-600: #9A000B;
+  --color-red-700: #88000A;
+  --color-red-800: #550B00;
+  --color-red-900: #400800;
+  --color-white: #FFFFFF;
+  --color-yellow-100: #FDEFD8;
+  --color-yellow-300: #F8CF8B;
+  --color-yellow-500: #F3AF3D;
+  --color-yellow-700: #926925;
+  --color-yellow-800: #31230C;
+}
+
+/* ═══ El núcleo de Codex, copiado literal de su bootstrap ═══════════════════
+ *
+ * No es cosmético — son las tres cosas de las que cuelga TODO el layout del deck:
+ *
+ *  · `box-sizing: border-box`. Sin esto el padding de cada lámina se suma a su altura en
+ *    vez de descontarse: la lámina pasa de 797 a 915 px, el grafo de la hoja de ruta crece
+ *    120 px y los dos nodos de abajo se salen de la pantalla. Fue exactamente lo que pasó.
+ *  · `* { margin: 0 }`. El deck no resetea los márgenes de h1/p/ol por su cuenta: da por
+ *    hecho que ya vienen en cero.
+ *  · `font-size: 62.5%`, o sea 1rem = 10px y no 16px. Cada clamp() de la hoja está
+ *    calibrado contra esa base; sin esto todo rinde un 60% más grande.
+ */
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+  -ms-overflow-style: scrollbar;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  margin: 0;
+}
+
+body {
+  font-family: 'Barlow', sans-serif;
+  font-weight: 400;
+  color: var(--color-gray-500);
+  font-size: 1.6rem;
+  width: 100%;
+  height: 100%;
+}
+
+:root {
+  --over-font: 'Barlow', 'Roboto', system-ui, sans-serif;
+
+  /* Typography — escalera del DS. OJO: Codex fija `html { font-size: 62.5% }`
+   * en `_base-style.scss`, así que **1rem = 10px**, no 16px. Estos tokens estaban
+   * calibrados como si 1rem fueran 16px (`--text-base: 1.125rem` "pensado" como 18px)
+   * y en realidad rendían 11.25px — de ahí que toda la app se viera ~30% más chica
+   * que el header de Codex, que sí usa la escala real. */
+  --text-lg: 2rem; /* 20px */
+  --text-base: 1.6rem; /* 16px */
+  --text-sm: 1.4rem; /* 14px */
+  --text-xs: 1.2rem; /* 12px */
+  --leading: 1.5;
+  --leading-tight: 1.35;
+
+  /* Radios del set del DS {2,4,6,8,16,50%,100px} — 12px no existía en la escala */
+  --over-radius: 16px;
+  --over-radius-sm: 8px;
+  --over-shadow: 0 0 8px rgb(79 79 79 / 20%);
+  --over-shadow-lg: 0 0 12px rgb(79 79 79 / 30%);
+
+  /* Paleta: repuntada a los tokens de Codex en vez de la rampa slate propia.
+   * Antes convivían dos rojos distintos (#b91c3c del proyecto vs #D41B00 del DS
+   * que usa el header), que es lo que se veía desalineado. */
+  --over-bg: var(--color-gray-50);
+  --over-surface: var(--color-white);
+  --over-surface-2: var(--color-gray-50);
+  --over-border: var(--color-gray-200);
+  --over-text: var(--color-gray-700);
+  --over-text-muted: var(--color-gray-500);
+  --over-primary: var(--color-red-500);
+  --over-primary-soft: var(--color-red-50);
+  --over-accent: var(--color-blue-500);
+  --over-accent-soft: var(--color-blue-50);
+  --over-focus: var(--color-gray-500);
+  --over-touch-min: 44px;
+}
+
+@charset "UTF-8";
+/* Presentación ejecutiva — Proyecto OVER.
+   Usa los tokens del wapp (--over-*, --color-*) y Barlow, la tipografía del producto:
+   la presentación tiene que verse de la misma familia que la herramienta que muestra.
+
+   Regla de contenido, no de estilo, pero se sostiene desde acá: cada lámina tiene UN
+   titular y lo mínimo. Los tamaños son deliberadamente grandes para que no quepa el
+   párrafo que uno querría agregar — el dato lo dice quien presenta, no la lámina. */
+body {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--over-bg);
+  font-family: var(--over-font);
+  overflow: hidden;
+}
+
+/* ── barra de progreso ─────────────────────────────────────────────── */
+.rail {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  z-index: 5;
+}
+.rail i {
+  display: block;
+  height: 100%;
+  background: var(--color-red-500);
+  transition: width 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ── marco de la lámina ────────────────────────────────────────────── */
+.deck {
+  height: 100%;
+  background: var(--color-gray-50);
+  color: var(--color-gray-700);
+  transition: background 0.3s ease;
+}
+
+.deck--oscura {
+  background: #0a0f1a;
+  color: #fff;
+}
+
+.lamina {
+  height: 100%;
+  /* Contexto de posicionamiento para los engranajes de la lámina de desarrollo, que van
+     absolutos y sangrados por el borde; el `overflow` los recorta acá y no en el deck. En
+     pantallas angostas el media query del final lo pasa a `auto` para poder scrollear. */
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.4rem, 4vw, 7.2rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.6rem, 2.4vw, 3.2rem);
+  animation: entrar 0.34s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.lamina.centrada {
+  justify-content: center;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(1.2rem);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lamina,
+  .par--abanico,
+  .abanico__hoja,
+  .dieciocho,
+  .uno-formato,
+  .explica > *,
+  .engranajes__g {
+    animation: none;
+  }
+  .rail i {
+    transition: none;
+  }
+}
+/* ── tipografía ────────────────────────────────────────────────────── */
+.epigrafe {
+  margin: 0;
+  font-size: clamp(1.1rem, 0.95vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-red-500);
+}
+
+.deck--oscura .epigrafe {
+  color: var(--color-red-400);
+}
+
+h1 {
+  margin: 0;
+  color: inherit;
+  font-size: clamp(4rem, 7vw, 9.6rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+h1 em {
+  font-style: normal;
+  color: var(--color-red-400);
+}
+
+h1.cierre {
+  font-size: clamp(3.2rem, 5.2vw, 7.2rem);
+}
+
+h2 {
+  margin: 0;
+  color: inherit;
+  font-size: clamp(2.8rem, 4.4vw, 6rem);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+}
+
+.bajada {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(1.6rem, 1.5vw, 2.2rem);
+  line-height: 1.45;
+  color: var(--color-gray-300);
+}
+
+.deck:not(.deck--oscura) .bajada {
+  color: var(--over-text-muted);
+}
+
+.cabecera {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2.4rem;
+  flex-wrap: wrap;
+  flex: 0 0 auto;
+}
+
+/* ── logotipos ─────────────────────────────────────────────────────────
+   Se fija SOLO la altura y `width: auto`: los tres archivos tienen proporciones
+   distintas y fijar el ancho los deformaría. */
+.logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  /* `.lamina` es un flex en columna, así que sin esto el <img> se estira al ancho
+     completo (los items flex hacen stretch en el eje transversal) y la proporción del
+     logo se rompe: quedaba de 1.352px de ancho por 47 de alto. */
+  align-self: flex-start;
+  flex: 0 0 auto;
+}
+
+.logo--portada {
+  height: clamp(4.8rem, 4.4vw, 7rem);
+  margin-bottom: clamp(1.6rem, 2vw, 2.8rem);
+}
+
+.logo--pie {
+  height: clamp(4.2rem, 3.8vw, 6rem);
+  margin-top: clamp(2.4rem, 3vw, 4.8rem);
+}
+
+/* ── portada ───────────────────────────────────────────────────────── */
+.portada {
+  justify-content: center;
+  background: radial-gradient(90rem 50rem at 78% 14%, rgba(212, 27, 0, 0.28), transparent 62%), radial-gradient(70rem 40rem at 6% 92%, rgba(0, 128, 169, 0.16), transparent 60%);
+}
+
+.creditos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(2.4rem, 4vw, 6.4rem);
+  margin: clamp(1.6rem, 2.4vw, 3.2rem) 0 0;
+}
+.creditos dt {
+  margin-bottom: 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gray-300);
+}
+.creditos dd {
+  margin: 0;
+  font-size: clamp(1.4rem, 1.2vw, 1.7rem);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.creditos div {
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+.creditos .vivo {
+  color: var(--color-red-400);
+}
+
+/* ── cifras grandes ────────────────────────────────────────────────── */
+.cifras {
+  display: grid;
+  gap: clamp(1.2rem, 1.6vw, 2.4rem);
+}
+.cifras div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.cifras strong {
+  font-size: clamp(3.6rem, 5.6vw, 8rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-red-500);
+}
+.cifras span {
+  font-size: clamp(1.3rem, 1.1vw, 1.6rem);
+  font-weight: 600;
+  color: var(--over-text-muted);
+}
+.cifras {
+  /* Ícono sobre la cifra. Chico y contenido a propósito: la cifra es la protagonista de la
+     lámina y un ícono grande le competía. Sirve para que la fila se lea de un barrido
+     —qué mide cada número— sin agregar una palabra. */
+}
+.cifras__i {
+  /* `.mi` es inline-block de 24px fijos: si no se fijan las tres medidas juntas, la
+     caja queda en 24 y el glifo escalado se recorta. */
+  font-size: clamp(2rem, 2vw, 2.8rem);
+  width: clamp(2rem, 2vw, 2.8rem);
+  height: clamp(2rem, 2vw, 2.8rem);
+  margin-bottom: 0.4rem;
+  color: var(--color-red-400);
+}
+
+.deck--oscura .cifras strong {
+  color: #fff;
+}
+.deck--oscura .cifras span {
+  color: var(--color-gray-300);
+}
+
+.cifras--cuatro {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes girar-inverso {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* ── la oportunidad ───────────────────────────────────────────────── */
+/* Dos columnas: son dos objetivos, y a este ancho cada uno se desarrolla en un párrafo
+   corto en vez de una línea telegráfica. */
+.objetivos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.6rem, 2.4vw, 4rem);
+}
+.objetivos li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+  padding-top: 1.6rem;
+  /* Regla arriba en vez de tarjeta: son bloques de texto, y encajonarlos los hacía leer
+     como fichas técnicas. */
+  border-top: 2px solid var(--color-red-500);
+  /* Ancla del ícono de marca de agua. */
+  position: relative;
+}
+.objetivos__n {
+  font-family: var(--over-font);
+  font-size: clamp(1.2rem, 1vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--color-red-500);
+}
+.objetivos {
+  /* Marca de agua, no ícono en la fila: esta lámina es la más textual del deck (intro + dos
+     párrafos) y meter el glifo en el flujo empujaba el cuerpo hacia abajo. Posicionado
+     arriba a la derecha da contexto de un vistazo y no consume alto.
+
+     Sigue el mismo criterio que los engranajes de la lámina de desarrollo: gráfica de
+     apoyo, tenue, sin competir con el texto. */
+}
+.objetivos__i {
+  position: absolute;
+  top: 1.4rem;
+  right: 0;
+  font-size: clamp(4.8rem, 5.5vw, 8rem);
+  width: clamp(4.8rem, 5.5vw, 8rem);
+  height: clamp(4.8rem, 5.5vw, 8rem);
+  color: var(--color-red-500);
+  opacity: 0.12;
+  pointer-events: none;
+}
+.objetivos strong {
+  font-size: clamp(1.8rem, 1.9vw, 2.8rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--over-text);
+}
+.objetivos {
+  /* "Valor educativo": el resumen ejecutivo lo pone entre paréntesis junto al segundo
+     objetivo. Va como etiqueta aparte para no competir con el título. */
+}
+.objetivos__eti {
+  font-style: normal;
+  font-size: clamp(1.1rem, 0.95vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-red-500);
+}
+.objetivos__c {
+  font-size: clamp(1.3rem, 1.15vw, 1.7rem);
+  line-height: 1.5;
+  color: var(--over-text-muted);
+}
+
+/* ── la cifra de plata ─────────────────────────────────────────────── */
+.plata {
+  padding: clamp(2rem, 2.4vw, 3.2rem);
+  border: 1px solid rgba(212, 27, 0, 0.36);
+  border-radius: var(--over-radius);
+  background: linear-gradient(150deg, rgba(212, 27, 0, 0.16), rgba(212, 27, 0, 0.03));
+}
+.plata__label {
+  margin: 0 0 0.8rem;
+  font-size: clamp(1.3rem, 1.1vw, 1.6rem);
+  font-weight: 600;
+  color: var(--color-gray-300);
+}
+.plata__valor {
+  margin: 0;
+  font-size: clamp(3.6rem, 5.6vw, 8rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+.plata__sub {
+  margin: 0.8rem 0 0;
+  font-size: clamp(1.5rem, 1.4vw, 2.1rem);
+  line-height: 1.4;
+  color: var(--color-gray-300);
+}
+.plata__sub strong {
+  color: #fff;
+}
+.plata {
+  /* El pie es letra chica a propósito: es la salvedad honesta, tiene que estar en la
+     lámina, pero no compite con la cifra. */
+}
+.plata__pie {
+  margin: 1.2rem 0 0;
+  font-size: clamp(1.1rem, 0.92vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--color-gray-300);
+}
+
+/* Variante sin monto: el borde rojo del bloque de plata sugería "cifra en pesos", y acá
+   la cifra es un conteo. */
+.plata--solida {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.par {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.6rem, 2vw, 2.8rem);
+  /* `start` y no el `stretch` por defecto: con los extractos ya recortados, estirar las
+     tarjetas al alto de la lámina dejaba media pantalla de recuadro vacío debajo del
+     texto. Cada tarjeta mide lo que mide su contenido. */
+  align-items: start;
+  align-content: center;
+}
+
+@media (hover: none) {
+  .ampliar {
+    opacity: 1;
+  }
+}
+
+/* Los lectores de pantalla leerían "18 aerolíneas formatos": el número está una sola vez
+   en el DOM. Se les da la frase completa y se les esconde la composición visual. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── transición entre "antes" y "después" ─────────────────────────── */
+/* `@if` reemplaza el DOM de golpe: sin esto la lámina parpadea de un estado al otro y no
+   se lee como una transformación del mismo documento, que es el punto.
+   Las hojas no entran sólo con un fundido: arrancan más giradas y más chicas y **se
+   acomodan** hasta su posición de reposo. En el "antes" el reposo es el desorden y en el
+   "después" es la alineación, así que el mismo gesto cuenta cosas distintas de cada lado:
+   a la izquierda las hojas se desparraman, a la derecha se ordenan. */
+@keyframes entra-panel {
+  from {
+    opacity: 0;
+    transform: translateY(1.6rem);
+  }
+}
+@keyframes entra-texto {
+  from {
+    opacity: 0;
+    transform: translateX(1.8rem);
+  }
+}
+@keyframes entra-hoja {
+  from {
+    opacity: 0;
+    transform: translateY(-44%) translateX(calc(var(--i) * 34%)) rotate(calc((var(--i) - 2) * 5deg + 13deg)) scale(0.88);
+  }
+}
+/* El abanico ordenado llega desde un desorden mayor: es el gesto de "esto se acomodó". */
+@keyframes entra-hoja-orden {
+  from {
+    opacity: 0;
+    transform: translateY(-44%) translateX(calc(var(--i) * 34%)) rotate(calc((var(--i) - 1.5) * 1.4deg + 11deg)) scale(0.88);
+  }
+}
+.par--abanico > .abanico {
+  align-self: center;
+}
+
+.abanico {
+  position: relative;
+  min-width: 0;
+  height: min(62vh, 46rem);
+}
+
+/* ── lámina de contexto ───────────────────────────────────────────── */
+/* Tres columnas: son tres pasos del mecanismo, y a dos quedaba uno solo en la fila de
+   abajo leyéndose como un agregado y no como parte de la secuencia. */
+.comos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.6rem, 2.4vw, 4rem);
+  margin-top: clamp(0.8rem, 1.2vw, 1.6rem);
+}
+.comos__i {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  padding-top: 1.6rem;
+  border-top: 2px solid var(--color-red-400);
+}
+.comos strong {
+  font-size: clamp(1.5rem, 1.45vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.comos span {
+  font-size: clamp(1.25rem, 1.05vw, 1.55rem);
+  line-height: 1.5;
+  color: var(--color-gray-300);
+}
+
+/* La bajada de esta lámina lleva una oración larga: con el max-width general de 46ch
+   quedaba en tres renglones cortos. */
+.bajada--contexto {
+  max-width: 78ch;
+}
+
+/* ── visor de PDF a pantalla completa ─────────────────────────────── */
+.visor {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: #0a0f1a;
+}
+.visor__fondo {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+.visor__barra {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.2rem clamp(1.6rem, 2.4vw, 3.2rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.visor__barra button {
+  padding: 0.8rem 1.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--over-radius-sm);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.visor__barra button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.visor__barra button:focus-visible {
+  outline: 1.6px solid #fff;
+  outline-offset: 2px;
+}
+.visor__barra {
+  /* El último botón (Cerrar) se separa del resto y queda contra el borde. */
+}
+.visor__barra button:last-child {
+  margin-left: auto;
+}
+.visor__t {
+  font-size: clamp(1.4rem, 1.3vw, 1.8rem);
+  font-weight: 700;
+  color: #fff;
+}
+.visor__hoja {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.2rem, 2vw, 2.4rem);
+  /* `max-height` en dvh y no en `%`: el contenedor es un flex item con `overflow:auto`,
+     así que su alto lo define el contenido y un `100%` no acota nada — la hoja se
+     cortaba por abajo en el modo "ajustar". Se descuenta la barra superior. */
+}
+.visor__hoja img {
+  max-width: 100%;
+  max-height: calc(100dvh - 9rem);
+  width: auto;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  background: #fff;
+}
+.visor__hoja {
+  /* Tamaño real: la hoja pasa a su ancho nativo y el contenedor scrollea. Es lo que
+     permite leer las condiciones del PDF de la aerolínea proyectado. */
+}
+.visor__hoja--real {
+  place-items: start center;
+}
+.visor__hoja--real img {
+  max-width: none;
+  max-height: none;
+  width: auto;
+}
+
+/* `pre.json` y no `.json` a secas.
+   En Angular esta regla estaba encapsulada en el componente del deck; compilada a CSS plano
+   quedo global, y el administrador embebido usa la MISMA clase en su boton `{}` — que
+   heredaba de aca el fondo gris y el borde, y se veia como un circulo mal centrado. El
+   tag lo ata al <pre> para el que se escribio. */
+pre.json {
+  margin: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 1.4rem 1.6rem;
+  border: 1px solid var(--over-border);
+  border-radius: var(--over-radius-sm);
+  background: var(--color-gray-50);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: clamp(0.95rem, 0.72vw, 1.15rem);
+  line-height: 1.55;
+  color: var(--over-text);
+  white-space: pre;
+  tab-size: 2;
+}
+
+/* ── flujo del motor ───────────────────────────────────────────────── */
+.flujo {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.flujo li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: clamp(1.6rem, 1.8vw, 2.4rem);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-right: 0;
+}
+.flujo li:first-child {
+  border-radius: var(--over-radius) 0 0 var(--over-radius);
+}
+.flujo li:last-child {
+  border-right: 1px solid rgba(212, 27, 0, 0.45);
+  border-color: rgba(212, 27, 0, 0.45);
+  border-radius: 0 var(--over-radius) var(--over-radius) 0;
+  background: rgba(212, 27, 0, 0.14);
+}
+.flujo__n {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-red-400);
+}
+.flujo {
+  /* Un ícono por paso: cinco columnas de texto seguidas se leían como una tabla. El glifo
+     le da a cada paso una silueta propia, que es lo que hace que la secuencia se siga de
+     un barrido mientras se la narra. */
+}
+.flujo__i {
+  font-size: 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  color: var(--color-red-400);
+}
+.flujo strong {
+  font-size: clamp(1.5rem, 1.3vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.flujo__linea {
+  font-size: clamp(1.15rem, 0.95vw, 1.4rem);
+  line-height: 1.45;
+  color: var(--color-gray-300);
+}
+.flujo {
+  /* El último paso (la alerta) va sobre fondo rojo: ahí el ícono en rojo-400 se pierde. */
+}
+.flujo li:last-child .flujo__i {
+  color: #fff;
+}
+
+/* ── demo: el buscador real embebido ──────────────────────────────── */
+/* El componente trae su propio `max-width` y padding de página; acá solo se le da el
+   marco y el scroll, sin tocar sus estilos: si se los sobreescribiera, la demo dejaría de
+   mostrar el buscador tal como lo ve el vendedor. */
+/* ── UI real embebida (administrador y editor) ─────────────────────── */
+.lamina--app {
+  gap: 1.2rem;
+  /* Bastante menos padding lateral que el resto de las láminas (hasta 7,2rem por lado).
+     Acá adentro no va texto de presentación sino una pantalla completa del wapp —tabla de
+     18 filas con siete columnas, tarjetas de KPI, buscador— y con el margen del deck sus
+     componentes internos quedaban apretados. El aire lo pone la lámina, no el marco. */
+  padding: clamp(1.2rem, 1.8vw, 2.4rem) clamp(0.8rem, 1vw, 1.4rem) clamp(1rem, 1.4vw, 1.8rem);
+}
+
+.cabecera--app {
+  align-items: flex-end;
+}
+.cabecera--app h2 {
+  font-size: clamp(2.2rem, 3vw, 4rem);
+}
+
+.marco-app {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--over-border);
+  border-radius: var(--over-radius);
+  background: var(--over-surface);
+  /* Aire propio del marco.
+     El administrador no trae padding de página —lo pone la ruta del wapp, que acá no
+     existe—, así que sus tarjetas de KPI y la tabla de 18 filas nacían pegadas al borde,
+     como si estuvieran recortadas. El margen lateral de la lámina se achicó en la misma
+     medida, para que el ancho útil de la tabla no cambie: es aire redistribuido, no
+     espacio quitado al contenido. */
+  padding: clamp(1.2rem, 1.6vw, 2.2rem);
+  /* Interactivas, no capturas.
+
+     En el wapp original estas láminas iban con `pointer-events: none`, porque el
+     administrador tiene botones de eliminar que borran políticas de verdad y un click
+     accidental proyectando en una sala no tiene vuelta atrás. Acá esa razón ya no existe:
+     no hay backend, y el interceptor de fixtures rechaza toda escritura con un 405. Lo
+     peor que puede pasar es un mensaje en pantalla, no una política borrada.
+
+     Así que se puede recorrer el administrador, apretar "editar" en cualquier fila —que
+     abre esa política en la lámina del editor— y tipear en el formulario. */
+}
+.marco-app > * {
+  display: block;
+}
+
+/* ── índice ───────────────────────────────────────────────────────── */
+.indice {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(8, 12, 21, 0.92);
+  display: grid;
+  place-items: center;
+  padding: 2.4rem;
+}
+.indice__fondo {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.indice__caja {
+  position: relative;
+  width: min(52rem, 100%);
+  max-height: 100%;
+  overflow: auto;
+  padding: 2.4rem;
+  border-radius: var(--over-radius);
+  background: #111827;
+  color: #fff;
+}
+.indice__titulo {
+  margin: 0 0 1.6rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gray-300);
+}
+.indice ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.indice button {
+  display: flex;
+  gap: 1.4rem;
+  width: 100%;
+  padding: 1.1rem 1.4rem;
+  border: 0;
+  border-radius: var(--over-radius-sm);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 1.5rem;
+  text-align: left;
+  cursor: pointer;
+}
+.indice button span {
+  color: var(--color-red-400);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.indice button:hover, .indice button.actual {
+  background: rgba(212, 27, 0, 0.22);
+}
+.indice button:focus-visible {
+  outline: 1.6px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── controles ────────────────────────────────────────────────────── */
+.hud {
+  position: fixed;
+  right: 1.8rem;
+  bottom: 1.6rem;
+  z-index: 15;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+.hud button {
+  min-width: var(--over-touch-min);
+  height: var(--over-touch-min);
+  padding: 0 1.2rem;
+  border: 1px solid var(--over-border);
+  border-radius: var(--over-radius-sm);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--color-gray-700);
+  font: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.hud button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.hud button:focus-visible {
+  outline: 1.6px solid var(--over-focus);
+  outline-offset: 2px;
+}
+.hud__idx {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── pantallas angostas / proyectores verticales ──────────────────── */
+@media (width <= 1024px) {
+  .cifras--tres,
+  .cifras--cuatro {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .par,
+  .par--ruta,
+  .flujo {
+    grid-template-columns: 1fr;
+  }
+  .flujo li {
+    border-right: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 0 !important;
+  }
+  .lamina {
+    overflow: auto;
+  }
+}
+/* ── la alerta: captura del correo real + documento que abre ──────── */
+/* Antes esta lámina dibujaba el correo en HTML porque la única captura disponible era de
+   512 px y proyectada se veía borrosa. Con una de 1238 px eso ya no aplica, y una captura
+   de un correo que de verdad se envió es más creíble que una reconstrucción fiel.
+
+   Dos columnas: el documento a la izquierda —vacío hasta que se aprieta el enlace— y el
+   correo a la derecha. El hueco de la izquierda no es un descuido: es el lugar donde va a
+   aparecer la hoja, y dejarlo vacío al principio es lo que hace que el gesto se lea. */
+.correo-img {
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* `aspect-ratio` con las medidas exactas del PNG (1238×1034) y no `inline-block`.
+     El marco es el ancla de la zona clickeable, así que tiene que coincidir **exactamente**
+     con la caja de la imagen. Como `inline-block` dentro de un flex se convierte en flex
+     item, no envolvía la imagen: quedaba más ancho, y los porcentajes del enlace se
+     calculaban contra una caja equivocada — la zona caía fuera del enlace por ~35px.
+     Con la proporción fija, marco e imagen son la misma caja. */
+}
+.correo-img__marco {
+  position: relative;
+  flex: 0 1 auto;
+  aspect-ratio: 1238/1034;
+  max-width: 100%;
+  max-height: 66vh;
+  min-width: 0;
+}
+.correo-img img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: 1px solid var(--over-border);
+  border-radius: var(--over-radius-sm);
+  box-shadow: var(--over-shadow);
+  background: #fff;
+}
+.correo-img {
+  /* Zona clickeable sobre el enlace "Abrir en Drive / PDF" del Top 1.
+
+     El correo es una imagen, así que el enlace no se puede clickear. Los porcentajes NO
+     son a ojo: se midieron sobre el PNG buscando los píxeles rojos del texto subrayado,
+     que da y 613-639, x 312-574 de 1238×1034 → 25,2% / 59,3% / 21,2% / 2,5%. Se le suma un
+     poco de alto para que el click sea cómodo proyectando.
+
+     Los otros dos enlaces (Top 2 y Top 3) están en el mismo x y en top 83,1% y 95,2%, por
+     si alguna vez se quieren hacer clickeables también.
+
+     Si se reemplaza la captura, hay que volver a medir. */
+}
+.correo-img__enlace {
+  position: absolute;
+  left: 25.2%;
+  top: 58.6%;
+  width: 21.2%;
+  height: 3.9%;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.28s ease;
+}
+.correo-img__enlace:hover, .correo-img__enlace:focus-visible {
+  background: rgba(212, 27, 0, 0.14);
+}
+.correo-img__enlace:focus-visible {
+  outline: 1.6px solid var(--over-focus);
+  outline-offset: 2px;
+}
+
+/* ── ingesta con IA: el video ─────────────────────────────────────── */
+.lamina--video {
+  gap: clamp(1.2rem, 1.8vw, 2rem);
+}
+
+.cabecera--video {
+  align-items: start;
+  flex: 0 0 auto;
+}
+
+/* Las seis etapas del pipeline, al lado del titular. Sirven de leyenda: en el video pasan
+   rápido y con letra chica, y así la audiencia sabe qué está mirando sin pausar. */
+.etapas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.5rem clamp(1.2rem, 1.6vw, 2.4rem);
+  font-size: clamp(1.15rem, 0.95vw, 1.4rem);
+  color: var(--color-gray-300);
+}
+.etapas li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  min-width: 0;
+}
+.etapas__n {
+  flex: 0 0 auto;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-red-400);
+}
+
+.video {
+  flex: 1 1 auto;
+  align-self: center;
+  min-height: 0;
+  width: auto;
+  max-width: 100%;
+  /* `max-height` y no `height: auto`: el video es 1600×818 y a ancho completo se desborda
+     por abajo en pantallas de proporción 16:10. */
+  max-height: 100%;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--over-radius-sm);
+  box-shadow: var(--over-shadow-lg);
+  background: #000;
+}
+
+/* ── hoja de ruta: la lista sola, sin imágenes al lado ───────────────── */
+/* Las dos imágenes salieron de la lámina: cada hito abre la suya a pantalla completa. Con
+   la lista como único contenido puede respirar y la tipografía crece. */
+/* Lo que abre el hito: el mockup o el buscador real. Botón explícito y no el hito entero
+   clickeable — así se ve cuáles tienen algo detrás y cuáles no. */
+.hito__accion {
+  grid-column: 2;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid var(--acento, var(--color-red-500));
+  border-radius: 100px;
+  background: transparent;
+  color: var(--acento-txt, var(--color-red-500));
+  font-family: var(--over-font);
+  font-size: clamp(1.2rem, 1vw, 1.45rem);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.28s ease, color 0.28s ease;
+}
+.hito__accion .mi {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+.hito__accion {
+  /* Relleno con el tono OSCURO del acento, no con el vivo: el texto va en blanco y sobre
+     el verde y el azul medios no llega a 4.5:1 —a 14px en negrita WCAG no los cuenta como
+     texto grande—. El borde conserva el tono vivo, así que la tarjeta no pierde su color.
+     Antes esto era rojo fijo: al colorear los hitos, el hover seguía saliendo rojo encima
+     de una tarjeta verde o azul. */
+}
+.hito__accion:hover, .hito__accion:focus-visible {
+  background: var(--acento-txt, var(--color-red-500));
+  border-color: var(--acento-txt, var(--color-red-500));
+  color: #fff;
+}
+.hito__accion:focus-visible {
+  outline: 1.6px solid var(--over-focus);
+  outline-offset: 3px;
+}
+
+/* ── popup del buscador real ─────────────────────────────────────────── */
+.popup {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.6rem, 3vw, 4rem);
+  background: rgba(8, 12, 21, 0.78);
+  /* Botón y no un div con (click): cerrar tiene que funcionar con teclado y lector de
+     pantalla, no sólo con mouse. Escape también cierra (ver `alTeclear`). */
+}
+.popup__fondo {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: zoom-out;
+}
+.popup__caja {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(150rem, 100%);
+  height: min(88rem, 100%);
+  min-height: 0;
+  border-radius: var(--over-radius);
+  background: var(--over-surface);
+  box-shadow: var(--over-shadow-lg);
+  overflow: hidden;
+}
+.popup__barra {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid var(--over-border);
+}
+.popup__barra button {
+  padding: 0.6rem 1.4rem;
+  border: 1px solid var(--over-border);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--over-text);
+  font-family: var(--over-font);
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.popup__barra button:hover {
+  background: var(--color-gray-100);
+}
+.popup__t {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--over-text);
+}
+.popup {
+  /* El buscador trae su propio alto; acá se le da el marco con scroll para que el popup no
+     crezca más allá de la pantalla. */
+}
+.popup__cuerpo {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ── nuestra solución: los cinco pasos + el correo ───────────────────── */
+.par--solucion {
+  grid-template-columns: 1fr 0.95fr;
+  align-items: center;
+  min-height: 0;
+}
+
+/* El flujo pasa de tira horizontal de cinco columnas a lista vertical: comparte la lámina
+   con la captura del correo, y en cinco columnas angostas los textos no se leían. */
+.flujo--vertical {
+  grid-template-columns: minmax(0, 1fr);
+}
+.flujo--vertical li {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0 clamp(1rem, 1.2vw, 1.6rem);
+  padding: clamp(0.9rem, 1vw, 1.4rem) clamp(1.2rem, 1.4vw, 2rem);
+  /* Se reponen los bordes: la variante horizontal los abre a la derecha para encadenar
+     los nodos, y acá la cadena va hacia abajo. */
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+.flujo--vertical li:first-child {
+  border-radius: var(--over-radius) var(--over-radius) 0 0;
+}
+.flujo--vertical li:last-child {
+  border-bottom: 1px solid rgba(212, 27, 0, 0.45);
+  border-color: rgba(212, 27, 0, 0.45);
+  border-radius: 0 0 var(--over-radius) var(--over-radius);
+  background: rgba(212, 27, 0, 0.14);
+}
+.flujo--vertical .flujo__n {
+  grid-area: 1/1/3/2;
+}
+.flujo--vertical .flujo__i {
+  grid-area: 1/2/3/3;
+}
+.flujo--vertical strong {
+  grid-area: 1/3/2/4;
+}
+.flujo--vertical .flujo__linea {
+  grid-area: 2/3/3/4;
+}
+.flujo--vertical {
+  /* El logo va a la derecha del nodo, no abajo: en la variante horizontal se
+     apoyaba al pie con `margin-top: auto`, que acá lo descolgaría de la fila. */
+}
+.flujo--vertical .logo--paso {
+  grid-area: 1/4/3/5;
+  align-self: center;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Sobre lámina oscura la captura del correo es una superficie blanca: el borde claro del
+   tema no la separa del fondo, y una sombra sí. */
+.deck--oscura .correo-img img {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: var(--over-shadow-lg);
+}
+
+.deck--oscura .correo-img figcaption {
+  color: var(--color-gray-300);
+}
+
+.correo-img figcaption {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  line-height: 1.45;
+  color: var(--over-text-muted);
+  text-align: center;
+}
+
+/* ── hallazgos: el conteo y el monto, lado a lado ────────────────────── */
+/* Dos cifras de naturaleza distinta: el conteo es un hecho medido y el monto una proyección
+   con techo. Van juntas porque juntas responden la pregunta del negocio, pero el monto va
+   más chico y sin el rojo del titular: no tienen el mismo peso probatorio. */
+/* ── hoja de ruta: el ecosistema como grafo ──────────────────────────── */
+/* Aristas en SVG (se dibujan solas) y nodos en HTML encima (son botones de verdad).
+   El estado no se dice con una etiqueta: se lee en el trazo — sólido lo que está en
+   producción, cortado lo que sigue, punteado lo que se está explorando. */
+.grafo {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 128rem;
+}
+
+.grafo__lineas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.grafo__arista {
+  stroke: var(--color-red-500);
+  stroke-width: 2;
+  /* `vector-effect` mantiene el grosor real aunque el viewBox se estire con
+     `preserveAspectRatio: none`; sin esto las líneas engordan distinto en cada eje. */
+  vector-effect: non-scaling-stroke;
+  /* Se dibujan de adentro hacia afuera, una después de otra: el gesto cuenta el orden en
+     que el ecosistema fue creciendo. 1200 alcanza para la diagonal más larga del lienzo. */
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: trazar 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: calc(220ms + var(--i) * 180ms);
+}
+
+.grafo__arista--siguiente {
+  stroke-dasharray: 10 8;
+  stroke-dashoffset: 0;
+  opacity: 0.75;
+  /* Ya no se dibuja: marcha. Lo que sigue está en movimiento, no terminado. */
+  animation: marchar 1.1s linear infinite;
+}
+
+.grafo__arista--futuro {
+  stroke-dasharray: 2 10;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  opacity: 0.5;
+  animation: marchar 2.4s linear infinite;
+}
+
+@keyframes trazar {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes marchar {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+/* El centro. Lo único que no cambia: todas las superficies consumen este motor. */
+.grafo__nucleo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: clamp(1.4rem, 1.8vw, 2.4rem) clamp(1.8rem, 2.4vw, 3.2rem);
+  border-radius: 50%;
+  aspect-ratio: 1;
+  justify-content: center;
+  min-width: clamp(14rem, 15vw, 20rem);
+  background: var(--color-red-500);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 0 0 0 rgba(212, 27, 0, 0.45);
+  animation: latir 3.2s ease-out infinite;
+}
+.grafo__nucleo .mi {
+  font-size: 3.2rem;
+  width: 3.2rem;
+  height: 3.2rem;
+}
+.grafo__nucleo strong {
+  font-size: clamp(1.5rem, 1.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.grafo__nucleo span {
+  font-size: clamp(1.05rem, 0.9vw, 1.25rem);
+  opacity: 0.85;
+  max-width: 14ch;
+}
+
+/* Anillo que respira: da la idea de un motor corriendo, no de un diagrama quieto. */
+@keyframes latir {
+  40%, 100% {
+    box-shadow: 0 0 0 2.4rem rgba(212, 27, 0, 0);
+  }
+}
+.grafo__nodo {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  width: min(30rem, 30vw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: clamp(1.2rem, 1.4vw, 1.8rem);
+  border: 1px solid var(--over-border);
+  border-radius: var(--over-radius);
+  background: var(--over-surface);
+  box-shadow: var(--over-shadow);
+  /* Entra después de que su arista llegó: primero se tiende el vínculo, después aparece la
+     superficie del otro lado. */
+  animation: entra-nodo 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: calc(700ms + var(--i) * 180ms);
+  /* Acento del nodo, en tres variables:
+     `--acento`      el tono que identifica al hito (borde, anillo);
+     `--acento-txt`  el mismo color oscurecido hasta ser legible sobre blanco;
+     `--acento-sobre` lo que va ENCIMA de `--acento`.
+     La tercera hace falta porque el glifo no puede ser blanco siempre: sobre el amarillo
+     #F3AF3D desaparece. Y `--acento-txt` no sirve de relleno: el yellow-800 (#31230C) es
+     casi negro y el hito perdía su color. */
+  --acento: var(--color-red-500);
+  --acento-txt: var(--color-red-500);
+  --acento-sobre: #fff;
+}
+.grafo__nodo--c-verde {
+  --acento: var(--color-green-500);
+  --acento-txt: var(--color-green-700);
+}
+.grafo__nodo--c-amarillo {
+  --acento: var(--color-yellow-500);
+  --acento-txt: var(--color-yellow-700);
+  --acento-sobre: var(--color-yellow-800);
+}
+.grafo__nodo--c-azul {
+  --acento: var(--color-blue-500);
+  --acento-txt: var(--color-blue-700);
+}
+.grafo__nodo--listo {
+  border-color: var(--acento);
+}
+.grafo__nodo--futuro {
+  border-style: dashed;
+}
+
+@keyframes entra-nodo {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+.grafo__cab {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.grafo__cab strong {
+  font-size: clamp(1.35rem, 1.2vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.grafo__marca {
+  flex: 0 0 auto;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: 2px solid var(--acento);
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--acento-txt);
+}
+
+/* Relleno con `--acento` para que el hito conserve su color; el glifo usa
+   `--acento-sobre`, que es blanco salvo donde el fondo es claro. */
+.grafo__nodo--listo .grafo__marca {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--acento-sobre);
+}
+
+.grafo__nodo--futuro .grafo__marca {
+  border-color: var(--over-border);
+}
+
+/* Marcas del hito de integraciones, apiladas y no en fila.
+   En fila no caben: el lockup de WISER es "COCHA WISER CORPORATE" en dos líneas, y a la
+   altura que permite meter tres logos a lo ancho de la tarjeta su segunda línea deja de
+   leerse. Apiladas, cada una usa el ancho completo y entra a un tamaño legible. */
+.grafo__marcas {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin: 0.4rem 0 0.2rem;
+  padding: 0;
+  list-style: none;
+}
+.grafo__marcas img {
+  height: 2rem;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+.grafo__marcas {
+  /* El isotipo es cuadrado: a la misma altura que un wordmark se ve desproporcionado,
+     y necesita el radio porque su degradado va a sangre. */
+}
+.grafo__marcas--iso {
+  height: 2.6rem !important;
+  border-radius: 0.6rem;
+}
+
+.grafo__linea {
+  font-size: clamp(1.15rem, 1vw, 1.4rem);
+  line-height: 1.4;
+  color: var(--over-text-muted);
+}
+
+.grafo__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+  margin: 0;
+  font-size: clamp(1.05rem, 0.9vw, 1.25rem);
+  color: var(--over-text-muted);
+}
+
+/* La leyenda repite el lenguaje de las aristas: mismo trazo, mismo significado. */
+.grafo__lg {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.grafo__lg::before {
+  content: "";
+  width: 2.4rem;
+  height: 0;
+  border-top: 2px solid var(--color-red-500);
+}
+.grafo__lg--siguiente::before {
+  border-top-style: dashed;
+  opacity: 0.75;
+}
+.grafo__lg--futuro::before {
+  border-top-style: dotted;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grafo__arista,
+  .grafo__nodo,
+  .grafo__nucleo {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+/* ── apertura del visor y de los popups ──────────────────────────────── */
+/* Abrir de golpe es desconcertante: la pantalla cambia entera y no queda rastro de qué la
+   abrió. Acá el contenido **crece desde el elemento que se apretó** — la tarjeta, el botón
+   del hito, la fila del correo— y el fondo oscuro entra por separado, más rápido.
+
+   Las tres variables las pone el componente al medir el elemento clickeado (ver
+   `medirOrigen`): `--ox`/`--oy` son el desplazamiento desde el centro de la pantalla hasta
+   el centro de ese elemento, y `--oe` su escala relativa. Los valores por defecto de acá
+   son el caso sin origen —abrir por teclado, o un disparador que no pasó el evento—: sin
+   desplazamiento y con una escala apenas menor, que da un zoom simple en el centro en vez
+   de un salto. */
+.visor,
+.popup {
+  --ox: 0px;
+  --oy: 0px;
+  --oe: 0.92;
+  animation: entra-fondo 0.28s ease-out both;
+}
+
+/* El fondo NO se transforma, sólo aparece: si escalara junto con el contenido se vería la
+   pantalla entera estirándose, que es justo el efecto brusco que se quiere sacar. */
+@keyframes entra-fondo {
+  from {
+    opacity: 0;
+  }
+}
+.visor__barra,
+.visor__hoja,
+.popup__caja {
+  animation: crecer-desde-origen 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* La barra del visor entra un pelo después que la hoja: primero aparece el contenido, y el
+   cromo lo alcanza. Al revés se siente como que la ventana llega antes que lo que trae. */
+.visor__barra {
+  animation-duration: 0.34s;
+  animation-delay: 0.06s;
+}
+
+@keyframes crecer-desde-origen {
+  from {
+    opacity: 0;
+    transform: translate(var(--ox), var(--oy)) scale(var(--oe));
+  }
+}
+/* Con movimiento reducido el contenido aparece sin desplazarse ni escalar: sólo el fondo
+   y una transición de opacidad corta. */
+@media (prefers-reduced-motion: reduce) {
+  .visor__barra,
+  .visor__hoja,
+  .popup__caja {
+    animation: entra-fondo 0.2s ease-out both;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Lo que aportaba Angular y acá hay que poner a mano. Son tres cosas y nada más.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 1 · Los íconos. En el original eran `<mat-icon>` de Angular Material, que es un
+   componente cuyo único trabajo era pintar una ligadura de Material Symbols en una caja
+   de 24px. Acá es un `<span class="mi">` con esas mismas medidas: la hoja compilada ya
+   trae las reglas que lo redimensionan (`.cifras__i`, `.fases__i`, …), y dependen de que
+   las tres medidas —font-size, width y height— se fijen juntas. */
+.mi {
+  font-family: 'Material Symbols Rounded';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  display: inline-block;
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  letter-spacing: normal;
+  text-transform: none;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* 2 · El cambio de lámina. `@switch` destruía y recreaba la lámina, y de eso dependían dos
+   cosas: la animación de entrada (`animation: entrar` sólo corre al montarse) y el video,
+   que arrancaba solo al aparecer. Acá las once láminas viven siempre en el DOM y se
+   muestra una; `deck.js` reinicia la animación a mano y pausa el video al salir. */
+/* `[hidden]` es solo `display: none` puesto por el navegador, y cualquier `display` de la
+   hoja le gana por especificidad: `.visor` y `.indice` son `display: flex`, asi que nacian
+   abiertos tapando la portada. En Angular estos bloques no existian en el DOM hasta que
+   hacian falta (`@if`); aca existen siempre y `hidden` es lo unico que los tapa, asi que
+   tiene que ganar siempre. */
+[hidden] {
+  display: none !important;
+}
+
+/* 3 · Las dos UI que en el original eran los componentes de producción embebidos
+   —el administrador y el buscador— y acá son capturas de esos mismos componentes.
+   Se mantiene el marco: el borde y el aire interior eran del deck, no del componente. */
+.marco-app img,
+.popup__cuerpo > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--over-radius-sm);
+}
+
+
+/* ── lámina 8: red de seguridad para el video ─────────────────────────────
+ *
+ * El encuadre en sí ya lo resuelve la regla original (`width: auto` + `max-height: 100%`):
+ * la caja del video toma la proporción del medio —1600x818— así que no quedan franjas
+ * negras a los lados, y el flex la achica cuando la ventana es más baja. Probé forzar la
+ * caja a `width/height: 100%` y es peor: la caja pasa a 2.62 de proporción contra 1.96 del
+ * video, y aparecen bandas negras.
+ *
+ * Lo único que faltaba era esto: si el encabezado crece —una etapa más, un titular más
+ * largo, una pantalla muy baja— el `overflow: hidden` de la lámina recortaba el video en
+ * silencio. Con `auto` se puede recorrer y el contenido no desaparece. */
+.lamina--video {
+  overflow: auto;
+}
+
+
+/* ── lámina 8: el video, montado con acercamientos ────────────────────────
+ *
+ * La grabación es de pantalla completa a 1600 px de ancho: entera se ve el flujo, pero los
+ * campos del editor —que es lo que la lámina quiere mostrar— no se leen proyectados.
+ *
+ * En vez de un control que haya que acordarse de apretar, el acercamiento va montado: una
+ * secuencia fija de 56 s, el largo exacto de la grabación, que alterna plano general y
+ * plano corto. Corre en loop junto con el video, así que la lámina se narra sola.
+ *
+ * El escalado va en un marco que recorta y no en el `<video>`, para no pelear con la caja
+ * que ya lo encuadraba bien: el marco hereda la proporción del medio, así que acercar
+ * cambia la escala y nunca el encuadre. */
+.video-zoom {
+  flex: 1 1 auto;
+  align-self: center;
+  min-height: 0;
+  max-height: 100%;
+  aspect-ratio: 1600 / 818;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--over-radius-sm);
+  box-shadow: var(--over-shadow-lg);
+  background: #000;
+}
+
+/* El borde y el radio pasaron al marco: repetidos acá dibujaban una línea doble, y el radio
+   recortaba dos veces dejando una costura en las esquinas. */
+.video-zoom .video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: montaje-video 18.8s ease-in-out infinite;
+}
+
+/* Quien pidió menos movimiento ve el video entero y quieto, que es la lámina completa: el
+   acercamiento agrega legibilidad, no contenido. */
+@media (prefers-reduced-motion: reduce) {
+  .video-zoom .video {
+    animation: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Lámina 5 — los condicionados, en un carrusel 3D.
+
+   Mismo CSS 3D que tenía el cubo: `preserve-3d` y cada hoja rotada sobre el eje del anillo.
+   Ninguna librería de escena — lo que hay encima son imágenes y texto, y una textura
+   rasterizada se vería borrosa justo donde esto se proyecta.
+
+   El anillo no es adorno: apiladas, las hojas prueban que UN formato es raro; girando,
+   prueban que son CATORCE y que ninguna se parece a la de al lado, que es el argumento.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+
+/* ── el titular que se transforma: 18 -> 8 y 1 ─────────────────────────────
+ *
+ * Un solo elemento para los dos estados. Los cuatro hijos no cambian: cambian de celda en
+ * la grilla, y el JS los anima de la posición vieja a la nueva (FLIP). Por eso el 18 se ve
+ * partirse —el 8 se queda arriba, el 1 baja— en vez de desaparecer y aparecer otro.
+ *
+ * Las celdas son 3 columnas x 2 filas:
+ *
+ *   antes      [ 1 ][ 8 ][ Aerolíneas ]      el 1 y el 8 ocupan las dos filas
+ *              [ 1 ][ 8 ][ Formatos   ]
+ *
+ *   después    [   ][ 8 ][ Aerolíneas ]      el 8 sube, el 1 baja a su propia línea
+ *              [ 1 ][   ][ Formato    ]
+ */
+.cifra {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: baseline;
+  column-gap: 0;
+  row-gap: clamp(0.2rem, 0.4vw, 0.6rem);
+  margin: 0;
+  /* Alto FIJO, y el mismo en los dos estados.
+   *
+   * Los dos estados no tienen el mismo contenido —en el "despues" baja una copia del 1— asi
+   * que la grilla los medía distinto: 201 px contra 154. Y como la lamina reparte el hueco
+   * sobrante entre encabezado y hojas, esos 47 px de diferencia cambiaban el tamano de los
+   * documentos al pasar de paso: 248 px en el "antes" y 293 en el "despues". Se veian
+   * saltar y crecer justo cuando pasaban a ser el protagonista.
+   *
+   * La medida es la del estado mas alto: dos filas de digito mas el hueco entre filas. El
+   * factor es 0.92 y no el 0.78 del `line-height`, porque la caja de linea real es mas alta
+   * que `cuerpo x line-height` —las metricas de la fuente suman ascendente y descendente—,
+   * y con 0.78 quedaba 11 px corto: el minimo no llegaba a atajar al estado mas alto y las
+   * hojas seguian cambiando de tamano (303 contra 293). Con margen, los dos estados quedan
+   * exactamente iguales, y lo que sobra son unos pixeles de aire en el encabezado. */
+  min-height: calc(2 * 0.92 * clamp(4rem, 5.4vw, 7rem) + clamp(0.2rem, 0.4vw, 0.6rem));
+  align-content: start;
+}
+
+.cifra__d {
+  /* Mas chico que el titular original (8.4vw).
+     El encabezado y las hojas se pelean el mismo alto, y las hojas son el punto de la
+     lamina: son los documentos lo que hay que poder mirar. A 8.4vw los digitos median 123 px
+     de cuerpo y dejaban a los documentos en 248 px. Bajados a 7rem el encabezado reserva
+     135 px en vez de 168, y esos 33 px se los queda la hoja: pasa a ~313 px. El 18 sigue
+     siendo lo mas grande de la lamina —es un titular, no un dato mas— pero deja de
+     competirle el espacio a los documentos, que son el punto. */
+  font-size: clamp(4rem, 5.4vw, 7rem);
+  font-weight: 800;
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+  color: var(--color-red-500);
+  font-variant-numeric: tabular-nums;
+}
+
+.cifra__p {
+  font-size: clamp(2.2rem, 3vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  padding-left: clamp(0.8rem, 1.2vw, 1.8rem);
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* La `s` que sobra: es la única letra de diferencia entre los dos estados, así que se
+   desvanece en el lugar en vez de reescribir la palabra. */
+.cifra__s {
+  font-style: normal;
+  display: inline-block;
+  transition: opacity 0.35s ease, max-width 0.5s ease;
+  overflow: hidden;
+  max-width: 1em;
+}
+
+/* — estado "antes": el 18 entero a la izquierda, sirviendo a las dos palabras — */
+.cifra[data-estado='antes'] .cifra__uno { grid-area: 1 / 1 / 3 / 2; }
+.cifra[data-estado='antes'] .cifra__ocho { grid-area: 1 / 2 / 3 / 3; }
+.cifra[data-estado='antes'] .cifra__aero { grid-area: 1 / 3; }
+.cifra[data-estado='antes'] .cifra__form { grid-area: 2 / 3; }
+
+/* — estado "después": el 18 se queda ENTERO encabezando "Aerolíneas", y lo que baja a
+     encabezar "Formato" es una copia del 1. Bajar el 1 original rompía el 18 y con él se
+     perdía el dato de que las aerolíneas siguen siendo dieciocho. — */
+.cifra[data-estado='despues'] .cifra__uno { grid-area: 1 / 1; }
+.cifra[data-estado='despues'] .cifra__ocho { grid-area: 1 / 2; }
+.cifra[data-estado='despues'] .cifra__aero { grid-area: 1 / 3; }
+.cifra[data-estado='despues'] .cifra__uno2 { grid-area: 2 / 1; }
+.cifra[data-estado='despues'] .cifra__form { grid-area: 2 / 3; }
+
+/* La copia del 1 sólo existe en el "después". */
+.cifra[data-estado='antes'] .cifra__uno2 {
+  display: none;
+}
+
+.cifra[data-estado='despues'] .cifra__s {
+  opacity: 0;
+  max-width: 0;
+}
+
+.docs3d {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.2rem, 2vw, 2.4rem);
+}
+
+.docs3d__escena {
+  /* El ancho de una ficha. El alto util de la lamina es fijo (~400 px), asi que la ficha del
+     frente no puede pasar de eso; con la proporcion casi cuadrada de abajo, ese alto da el
+     ancho maximo aprovechable. */
+  --hoja: clamp(20rem, 23vw, 34rem);
+  /* Alto EXPLICITO, no heredado del flex.
+     Con `flex: 1 1 auto` el alto salia de una resolucion circular —el flex preguntaba al
+     grid, el grid a las hojas, y las hojas tenian `height: 100%`—, y el navegador la
+     resolvia distinto en cada estado: 345 px con el coverflow y 281 con la hoja unica. O
+     sea la misma hoja cambiaba de tamano al pasar de paso, que es justo lo que se veia como
+     "el despues quedo mas chico". Con una medida definida los dos estados miden igual y
+     `height: 100%` significa algo. */
+  /* `flex-basis: 0` y no `auto`.
+     Con `auto` el alto base sale del contenido, y como las hojas piden `height: 100%` la
+     resolucion era circular: el navegador la contestaba distinto en cada estado (345 px con
+     el coverflow, 281 con la hoja unica). Con la base en 0 el alto sale ENTERO de repartir
+     el hueco sobrante, que es una medida definida — asi `grid-template-rows: 100%` y el
+     `height: 100%` de las hojas significan algo, y la escena toma exactamente el hueco que
+     hay: nunca desborda ni deja aire de sobra, sin ningun `vh` adivinado. */
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  grid-template-rows: 100%;
+  place-items: center;
+  /* Larga: corta, las fichas de los costados se estiran tanto que dejan de parecer
+     documentos y el efecto se vuelve un tunel. */
+  perspective: 190rem;
+}
+
+.cover {
+  grid-area: 1 / 1;
+  position: relative;
+  /* Manda el ALTO disponible, no el ancho.
+     La ficha del centro esta a profundidad 0, asi que se dibuja exactamente del tamano que
+     diga el CSS — sin agrandarse por perspectiva. Fijando el ancho, en una ventana baja la
+     ficha salia mas alta que el hueco y se montaba sobre el texto del pie. Atada al alto,
+     el ancho lo deduce la proporcion y nunca desborda; `--hoja` queda como tope para que en
+     una pantalla muy alta tampoco se vaya de escala. */
+  height: 100%;
+  width: auto;
+  max-width: var(--hoja);
+  max-height: calc(var(--hoja) * 1.05);
+  /* Casi cuadrada, y no con la proporcion de una hoja A4.
+     El alto disponible es fijo, asi que con proporcion A4 la ficha del frente sale angosta.
+     Recortada a casi cuadrada, el mismo alto da un 35% mas de ancho y todo lo que se ve se
+     ve mas grande. Lo que se pierde es el pie de cada documento, que es donde nunca pasa
+     nada: el encabezado y la tabla —lo que prueba que los formatos son distintos— viven
+     arriba, y `object-position: top` los conserva. */
+  aspect-ratio: 1 / 1.05;
+  transform-style: preserve-3d;
+  transition: opacity 0.6s ease;
+}
+
+/* Cada ficha la coloca el JS con `--x`, `--z`, `--ry`, `--s` y `--o`, que recalcula en cada
+   cuadro. En CSS solo queda como se COMPONEN, que es lo que tiene que ser estable: primero
+   el desplazamiento lateral, despues la profundidad y al final el giro sobre su eje — en
+   otro orden, girar mueve la ficha de sitio en vez de girarla donde esta. */
+.doc3d {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  transform: translateX(var(--x, 0px)) translateZ(var(--z, 0px)) rotateY(var(--ry, 0deg)) scale(var(--s, 1));
+  opacity: var(--o, 1);
+  z-index: var(--capa, 1);
+  transition: transform 0.9s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.7s ease;
+}
+
+/* Mientras el coverflow corre, el JS pisa el sitio en cada cuadro y una transicion de 0.9 s
+   lo dejaria siempre persiguiendo al cuadro anterior: se veria pastoso. La transicion solo
+   hace falta para el cierre —cuando las catorce caen al centro—, asi que se apaga mientras
+   se desliza. */
+/* Cerrado el coverflow, las catorce fichas caen al centro y se apagan: lo que queda en
+   pantalla es el formato unico. Sin esto siguen visibles detras y la lamina muestra a la vez
+   el problema y la solucion, que es justo lo que el paso quiere separar. */
+/* En el "despues" la escena gana alto y se ancla arriba.
+ *
+ * La hoja unica esta sola en pantalla: puede —y debe— ser mas grande que una ficha del
+ * coverflow, donde catorce se reparten el espacio. A igual tamano se leia como una version
+ * reducida del "antes", que es lo contrario de lo que el paso quiere decir.
+ *
+ * `align-items: start` fija el borde SUPERIOR: asi la hoja crece hacia abajo y no salta de
+ * posicion al cambiar de paso — y queda mas arriba, que es donde se la ve mejor. */
+.docs3d:not([data-vista='antes']) .docs3d__escena {
+  align-items: start;
+}
+
+.docs3d:not([data-vista='antes']) .doc3d {
+  transform: none;
+  opacity: 0;
+}
+
+.docs3d[data-vista='antes'] .doc3d {
+  transition: none;
+}
+
+.doc3d img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: var(--over-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+}
+
+.doc3d figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0 0 var(--over-radius-sm) var(--over-radius-sm);
+  /* El rotulo va SOBRE la hoja y no debajo: colgado fuera, al deslizarse se despega de su
+     documento y termina leyendose junto al de al lado.
+     Barra opaca y no degradado: sobre un documento —texto denso y oscuro sobre blanco— un
+     degradado deja el nombre mezclado con el contenido y no se lee ninguno de los dos. */
+  background: rgba(6, 10, 18, 0.93);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  text-align: left;
+  /* Solo el del frente lleva rotulo legible: catorce nombres a la vez es ruido, y en las
+     fichas de los costados quedan de canto e ilegibles igual. */
+  opacity: var(--rotulo, 0);
+  transition: opacity 0.35s ease;
+}
+
+.doc3d figcaption strong {
+  font-size: clamp(1.2rem, 1.1vw, 1.55rem);
+  font-weight: 800;
+}
+
+.doc3d figcaption span {
+  font-size: clamp(1rem, 0.9vw, 1.3rem);
+  line-height: 1.3;
+  color: var(--color-gray-300);
+}
+
+/* ── el "después": el coverflow se cierra, y después se abre en abanico ────
+ *
+ * Dos estados, no uno. En `despues` cae UNA hoja al centro: el formato único. En `abanico`
+ * esa misma hoja se corre a un lado y aparecen las demás, todas iguales — el argumento
+ * inverso al del anillo: allá cada hoja era distinta de la de al lado, acá las seis son la
+ * misma hoja con otros datos.
+ *
+ * Las hojas del abanico existen desde el principio, apiladas exactamente detrás de la
+ * primera: así el paso de una a seis es que se abren, no que aparecen. */
+
+.homos {
+  grid-area: 1 / 1;
+  position: relative;
+  /* Mismo alto que la ficha del coverflow, no menos: la hoja del "despues" es la
+     protagonista del paso, y a 88% se leia como una version reducida de la del "antes".
+     Arriba y no centrada —`align-self: start`— porque el abanico crece hacia los costados y
+     hacia abajo: anclada al centro, las hojas de los extremos bajaban sobre el texto del
+     pie. */
+  align-self: start;
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1 / 1.05;
+  max-width: calc(var(--hoja) * 1.6);
+  opacity: 0;
+  transition: opacity 0.6s ease 0.3s;
+  pointer-events: none;
+}
+
+.homo {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  transform-origin: 50% 92%;
+  /* Todas nacen apiladas sobre la primera. */
+  transform: rotate(0deg) translateX(0);
+  transition: transform 0.85s cubic-bezier(0.3, 0.9, 0.3, 1), opacity 0.5s ease;
+  opacity: 0;
+}
+
+.homo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: var(--over-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+
+.homo figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 0.7rem 1rem;
+  border-radius: 0 0 var(--over-radius-sm) var(--over-radius-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(6, 10, 18, 0.93);
+  color: #fff;
+  font-size: clamp(1.05rem, 0.95vw, 1.35rem);
+  font-weight: 700;
+  text-align: left;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Paso 2 — el formato único: sólo la primera hoja, centrada. */
+.docs3d[data-vista='despues'] .homos,
+.docs3d[data-vista='abanico'] .homos {
+  opacity: 1;
+}
+
+.docs3d[data-vista='despues'] .homo:first-child,
+.docs3d[data-vista='abanico'] .homo {
+  opacity: 1;
+}
+
+/* Paso 3 — las seis, en fila solapada y a TAMANO COMPLETO.
+ *
+ * La primera version las abria en abanico girando desde el pie, y eso las achicaba en la
+ * practica: rotadas, cada hoja mostraba una franja angosta y en diagonal, ilegible desde el
+ * fondo de una sala. Puestas en fila cada una conserva su tamano entero —el mismo de la hoja
+ * unica del paso anterior— y se solapan al 45%, que alcanza para ver de cada una el
+ * encabezado y el arranque de la tabla: justamente lo que prueba que las seis son la misma
+ * hoja. La ultima queda entera.
+ *
+ * `--j` lo numera el HTML de 0 a 5; el -2.5 centra la fila en vez de abrirla toda hacia un
+ * lado. La inclinacion es minima, solo para que no se lea como una pila plana. */
+.docs3d[data-vista='abanico'] .homo {
+  transform: translateX(calc((var(--j) - 2.5) * 15rem)) rotate(calc((var(--j) - 2.5) * 1.2deg));
+  /* Se apilan de izquierda a derecha: sin esto el orden del DOM dejaba la primera encima y
+     la fila se leia al reves de como se recorre. */
+  z-index: calc(var(--j) + 1);
+}
+
+.docs3d[data-vista='abanico'] .homo figcaption {
+  opacity: 1;
+}
+
+.docs3d__leyenda {
+  align-self: end;
+  margin: 0;
+  font-size: clamp(1.1rem, 1vw, 1.4rem);
+  color: var(--color-gray-300);
+}
+
+.docs3d__pie {
+  max-width: 78ch;
+  margin: 0;
+  /* Espacio reservado para TRES lineas, que es lo que ocupa el pie mas largo (el del
+     "despues"). El del "antes" ocupa dos, asi que le sobra una — y esa es justamente la
+     idea: reservando el maximo, el bloque de hojas mide y se ubica igual en los dos pasos.
+     Sin esto, la linea de mas del "despues" le quitaba 32 px a las hojas y el documento se
+     veia encoger justo al pasar de paso, como si se hubiera movido. */
+  min-height: calc(3 * 1.5em);
+  text-align: center;
+  /* Bastante mas grande que el original (1.1vw = 16 px): proyectado no se leia. El
+     `max-width` esta en `ch`, o sea en anchos de caracter, asi que crece con la letra y el
+     texto sigue entrando en dos lineas — lo unico que cambia es el alto de cada una. */
+  font-size: clamp(1.5rem, 1.5vw, 2.1rem);
+  line-height: 1.5;
+  color: var(--color-gray-200);
+}
+
+.docs3d__pie strong {
+  color: #fff;
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   El paso de una lámina a otra, como transformación.
+
+   Antes cada lámina entraba con su propia animación y la anterior desaparecía: un corte.
+   Acá el navegador fotografía el antes y el después y interpola — pero eso solo, sin
+   nombres, da un fundido cruzado, que sigue siendo un corte suave.
+
+   Lo que lo convierte en transformación es `view-transition-name`: cuando un elemento de
+   la lámina que sale y otro de la que entra comparten nombre, el navegador los trata como
+   el MISMO elemento y lo mueve, lo escala y lo recolorea de una posición a la otra. El
+   epígrafe, el titular y el fondo cumplen el mismo papel en casi todas las láminas, así que
+   comparten nombre y se ven viajar de un sitio al otro en vez de aparecer y desaparecer.
+
+   Un nombre tiene que ser ÚNICO por instantánea: por eso se pone sobre la lámina visible y
+   no sobre las once a la vez — con las once en el DOM, once epígrafes con el mismo nombre
+   invalidan la transición entera y el navegador la descarta sin avisar.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.lamina:not([hidden]) {
+  view-transition-name: lamina;
+}
+
+.lamina:not([hidden]) > .epigrafe,
+.lamina:not([hidden]) .cabecera .epigrafe {
+  view-transition-name: epigrafe;
+}
+
+.lamina:not([hidden]) h1,
+.lamina:not([hidden]) h2 {
+  view-transition-name: titular;
+}
+
+.lamina:not([hidden]) .bajada {
+  view-transition-name: bajada;
+}
+
+/* El fondo del deck se recolorea solo, sin instantánea: es un color plano y capturarlo
+   agrega una capa que tapa a las demás durante el cruce. */
+::view-transition-group(lamina) {
+  animation-duration: 0.62s;
+}
+
+::view-transition-old(lamina),
+::view-transition-new(lamina) {
+  animation-duration: 0.62s;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* Los tres elementos con nombre propio viajan más rápido que el fondo: llegan a destino
+   antes de que termine el cruce, así se lee que ELLOS se movieron y el resto cambió
+   alrededor, en vez de que todo se desplace en bloque. */
+::view-transition-group(epigrafe),
+::view-transition-group(titular),
+::view-transition-group(bajada) {
+  animation-duration: 0.52s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.15, 1);
+}
+
+/* El contenido que no tiene par —los abanicos, el cubo, la tabla— entra deslizándose desde
+   el lado al que se va, y sale hacia el contrario. Es lo que le da sentido de dirección al
+   gesto: hacia adelante todo corre a la izquierda, hacia atrás a la derecha. */
+@keyframes vt-entra {
+  from {
+    opacity: 0;
+    transform: translateX(var(--vt-desde, 3.5rem));
+  }
+}
+
+@keyframes vt-sale {
+  to {
+    opacity: 0;
+    transform: translateX(var(--vt-hacia, -3.5rem));
+  }
+}
+
+::view-transition-new(lamina) {
+  animation-name: vt-entra;
+}
+
+::view-transition-old(lamina) {
+  animation-name: vt-sale;
+}
+
+:root[data-sentido='atras'] {
+  --vt-desde: -3.5rem;
+  --vt-hacia: 3.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
+/* La lámina que se está yendo.
+ *
+ * Durante el cruce hay DOS láminas visibles. Como hermanas en el flex del deck se
+ * repartirían el alto y las dos saltarían de tamaño a mitad de la animación, así que la
+ * saliente se saca del flujo y se apoya encima, ocupando exactamente el mismo rectángulo.
+ * `pointer-events: none` porque ya no es la lámina activa: un click suyo mientras se apaga
+ * llegaría a un botón que el espectador ya no ve. */
+.lamina--saliendo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* El deck pasa a ser el marco de las dos: sin contexto de posicionamiento, la saliente se
+   apoyaría contra la ventana y no contra la lámina. */
+.deck {
+  position: relative;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Lámina 8 — el embudo de resultados.
+
+   Forma **emphasis**: una barra en el acento y el resto en el gris de retroceso. Es la
+   forma que corresponde cuando una serie es el punto y las demás son contexto — acá la
+   tercera etapa es el hallazgo y las dos primeras lo sostienen.
+
+   Deliberadamente NO es una paleta categórica de tres rojos: el validador de paleta las
+   rechaza (rojo-500 contra rojo-400 dan ΔE 7.8 en visión normal, por debajo del piso de 15
+   — ni con vista perfecta se distinguen). Acá el color no distingue etapas: eso lo hace el
+   largo de la barra y el valor escrito al final de cada una.
+
+   Contraste contra el fondo del deck (#0a0f1a), medido: acento #DC4F4C = 4.80:1 y gris de
+   retroceso #666 = 3.34:1. Los dos por encima del 3:1 que pide una marca de datos.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.embudo {
+  margin: 0;
+  /* Todo el ancho de la lamina, igual que el bloque del monto que va debajo. Con un
+     `max-width` propio el embudo terminaba antes que ese bloque y las dos piezas de la
+     misma lamina se leian desalineadas; de paso las barras ganan largo, que es lo unico
+     que hace legible una fraccion del 15%. */
+  width: 100%;
+  display: grid;
+  gap: clamp(1.2rem, 1.8vw, 2rem);
+}
+
+.embudo__t {
+  font-size: clamp(1.2rem, 1.1vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-gray-300);
+}
+
+.embudo__l {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: clamp(1rem, 1.4vw, 1.6rem);
+}
+
+/* Tres columnas: etiqueta · pista de la barra · valor.
+   La etiqueta y el valor tienen ancho propio para que las tres pistas arranquen y terminen
+   en la misma vertical — si no, el largo de las barras deja de ser comparable, que es lo
+   único que una barra tiene que hacer bien. */
+.embudo__f {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1.2rem, 2vw, 2.4rem);
+}
+
+.embudo__k {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: clamp(1.2rem, 1.15vw, 1.6rem);
+  font-weight: 600;
+  /* Texto con tokens de texto, nunca con el color de la serie: el color vive en la barra,
+     que es la marca. */
+  color: var(--color-gray-300);
+}
+
+.embudo__k .mi {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-gray-400);
+}
+
+/* La pista: un riel apenas visible que marca el 100%, para que una barra corta se lea como
+   "una fracción de" y no como "una barra corta". */
+.embudo__barra {
+  position: relative;
+  height: 1.8rem;
+  border-radius: 0 4px 4px 0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.embudo__barra i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--pct) * 1%);
+  /* Extremo del dato redondeado, base cuadrada: la barra nace de una línea común y crece
+     hacia la derecha. Redondearla de los dos lados la haría flotar. */
+  border-radius: 0 4px 4px 0;
+  background: #666666;
+  /* Crece al entrar a la lámina. La escala en X y no el `width` porque `transform` no
+     dispara reflow: con tres barras da igual, pero es la forma correcta de animar tamaño. */
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.05s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.embudo__f--foco .embudo__barra i {
+  background: #dc4f4c;
+}
+
+/* Las tres entran escalonadas, de arriba abajo: así se lee como un recorrido —de la reserva
+   a la oportunidad— y no como tres datos que aparecen juntos. */
+.lamina[data-entrada='si'] .embudo__f:nth-child(1) .embudo__barra i {
+  transform: scaleX(1);
+  transition-delay: 0.15s;
+}
+.lamina[data-entrada='si'] .embudo__f:nth-child(2) .embudo__barra i {
+  transform: scaleX(1);
+  transition-delay: 0.45s;
+}
+.lamina[data-entrada='si'] .embudo__f:nth-child(3) .embudo__barra i {
+  transform: scaleX(1);
+  transition-delay: 0.75s;
+}
+
+/* Etiqueta directa al final de cada barra: son tres, así que no hay riesgo de inundar el
+   gráfico, y con el valor escrito no hacen falta ejes ni grillas. */
+.embudo__v {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  min-width: 12rem;
+}
+
+.embudo__v b {
+  font-size: clamp(2rem, 2.2vw, 3rem);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.embudo__v em {
+  font-style: normal;
+  font-size: clamp(1.1rem, 1vw, 1.35rem);
+  font-weight: 700;
+  color: var(--color-gray-400);
+}
+
+.embudo__f--foco .embudo__v em {
+  color: #dc4f4c;
+}
+
+.embudo__nota {
+  margin: 0;
+  font-size: clamp(1.15rem, 1.1vw, 1.5rem);
+  line-height: 1.5;
+  color: var(--color-gray-300);
+}
+
+.embudo__nota strong {
+  color: #fff;
+}
+
+/* Sin animación: las barras nacen ya en su largo. El gráfico se lee igual — la animación
+   agrega ritmo al relato, no información. */
+@media (prefers-reduced-motion: reduce) {
+  .embudo__barra i {
+    transform: scaleX(1);
+    transition: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Lámina 2 — el texto, y sus dos pasos en el visor.
+
+   La lámina muestra el texto; la flecha abre el correo en grande y la siguiente el PDF que
+   el correo enlaza. Los dos van al visor a pantalla completa, que es el mismo que usa el
+   resto del deck.
+
+   Antes el correo iba en una columna al lado del texto: ahí competía con los tres bloques,
+   se leía chico y obligaba a acotarlo a 46vh para que la lámina no desbordara. En el visor
+   entra completo, y el texto se queda con toda la lámina.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Los disparadores de los pasos. No se ven ni se pueden tabular: los aprieta la flecha.
+   Centrados y de 1 px a propósito — el visor crece DESDE el elemento que lo pidió, así que
+   puestos en una esquina el correo se abriría desde el borde de la pantalla. */
+.paso-disparador {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  background: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Lámina 7 — el acercamiento a cada card de la hoja de ruta.
+
+   Las cuatro cards están repartidas por el lienzo y cada una abre algo a pantalla completa.
+   Sin un gesto previo que diga cuál se está narrando, la audiencia no sabe dónde mirar
+   antes de que aparezca la imagen. El acercamiento es ese gesto: la card crece, las otras
+   se atenúan, y recién entonces se abre lo que hay detrás.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* La transición va en `.grafo__nodo` y no sólo en el estado enfocado, para que el ALEJARSE
+   también se anime — si no, la card volvía a su sitio de golpe.
+   `transform` ya lo usa la card para centrarse en su punto del grafo (`translate(-50%,-50%)`),
+   así que el acercamiento se suma ahí mismo y no puede escribirse por separado. */
+.grafo__nodo {
+  transition: transform 0.58s cubic-bezier(0.3, 0.85, 0.25, 1), opacity 0.45s ease, box-shadow 0.45s ease;
+}
+
+/* Mientras hay una card enfocada, las demás se apagan. El selector cuelga del atributo del
+   grafo —y no de una clase en cada card— para que agregar una card no obligue a tocar esto. */
+.grafo[data-enfocada]:not([data-enfocada='']) .grafo__nodo:not(.grafo__nodo--enfocada) {
+  opacity: 0.32;
+}
+
+.grafo__nodo--enfocada {
+  /* El `translate` se repite porque `transform` no es acumulativo: escribir sólo el `scale`
+     borraría el centrado de la card en su punto del grafo y saltaría a otro sitio. */
+  transform: translate(-50%, -50%) scale(1.12);
+  z-index: 6;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+
+/* Las aristas también se apagan: enfocada una card, el resto del grafo es contexto. */
+.grafo[data-enfocada]:not([data-enfocada='']) .grafo__lineas {
+  opacity: 0.4;
+  transition: opacity 0.45s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grafo__nodo,
+  .grafo__lineas {
+    transition: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   La red de seguridad de las animaciones de entrada.
+
+   Casi todo lo que entra en este deck lo hace con una animación de CSS que arranca en
+   `opacity: 0` y lleva `fill: both` — las láminas, las cards del grafo, sus aristas, las
+   hojas del abanico. Y varias llevan además un retardo escalonado.
+
+   Un navegador con la ventana en segundo plano CONGELA las animaciones. Una animación con
+   `fill` congelada antes de empezar sigue imponiendo su primer fotograma, así que el
+   contenido se queda invisible — y no por un rato: para siempre, porque al recuperar el
+   foco la animación reanuda desde donde estaba y nadie la vio arrancar. Con la hoja de ruta
+   eso dejaba las cuatro cards en blanco.
+
+   `deck.js` marca la raíz mientras la ventana no está a la vista y esta regla apaga las
+   entradas: sin animación, cada elemento se dibuja en su estilo de reposo, que es
+   exactamente el estado final correcto. Nadie está mirando la entrada de todos modos.
+   ══════════════════════════════════════════════════════════════════════════ */
+/* El alcance es TODO el documento, no sólo las láminas.
+   El visor, los popups y el índice cuelgan de `body` como hermanos de la lámina, así que
+   acotando la regla a `.lamina *` quedaban afuera — y ahí también hay transiciones que se
+   congelan: la hoja que se solapa en el visor quedaba en opacidad 0 con la clase puesta. */
+:root[data-sin-animacion] body,
+:root[data-sin-animacion] body * {
+  animation: none !important;
+  /* Las transiciones también, y por la misma razón. Una transición en curso impone su valor
+     interpolado por encima de la hoja, así que congelada retiene el valor ANTERIOR al cambio
+     — para siempre. Se vio en el acercamiento a las cards de la hoja de ruta: la clase con
+     el `scale(1.12)` se aplicaba, pero la transición congelada seguía devolviendo escala 1 y
+     la card no crecía nunca.
+
+     Y no son sólo estas: el coverflow, el abanico, el embudo y el correo también usan
+     transiciones. Apagarlas mientras nadie mira deja cada cosa en su valor final, que es lo
+     correcto. */
+  transition: none !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   La segunda hoja del visor, solapada sobre la primera.
+
+   El hito "Top 3 de aerolíneas con mayor over en disponibilidad/tarificar" son dos momentos
+   del mismo aviso: primero la señal sobre la pantalla de disponibilidad, después la misma
+   señal al tarificar. Se muestran una encima de la otra —y no reemplazando la primera—
+   porque el punto es que es el MISMO aviso en dos lugares del flujo, no dos pantallas
+   distintas.
+
+   Va corrida hacia abajo y a la derecha, con sombra propia: apilada sin desfase se leería
+   como que la primera cambió, no como que apareció algo sobre ella.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.visor__sobre {
+  position: absolute;
+  /* Anclada al centro de la hoja y desde ahí corrida: así el desfase no depende del tamaño
+     que el navegador le haya dado a la hoja de abajo. */
+  left: 50%;
+  top: 50%;
+  width: 78%;
+  height: auto;
+  transform: translate(-38%, -34%);
+  border-radius: var(--over-radius-sm);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  /* Entra desde abajo y a la derecha, como algo que se posa sobre la pantalla. */
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.66s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+.visor__hoja--sobre .visor__sobre {
+  opacity: 1;
+}
+
+/* El fotograma de partida: más abajo, más a la derecha y algo más chica. La clase la pone
+   `deck.js` un cuadro antes de revelarla, para que haya dos estados que interpolar. */
+.visor__sobre[hidden] {
+  display: none;
+}
+
+.visor__hoja:not(.visor__hoja--sobre) .visor__sobre {
+  transform: translate(-30%, -22%) scale(0.96);
+}
+
+/* Mientras hay una hoja encima, la de abajo se atenúa un poco: sigue dando contexto pero
+   deja de competir por la atención. */
+.visor__hoja--sobre > img:first-child {
+  opacity: 0.55;
+  transition: opacity 0.5s ease;
+}
+
+/* En "tamaño real" la hoja de abajo pasa a su ancho nativo y scrollea: una segunda hoja
+   absoluta encima quedaría flotando sobre el scroll, así que ahí no se muestra. */
+.visor__hoja--real .visor__sobre {
+  display: none;
+}
+
+/* Dos marcas en la misma fila de la lista de integraciones.
+   El `ul` es una columna —una marca por renglón—, y Cocha + WISER son una sola integración,
+   así que comparten renglón en vez de ocupar dos. El separador es el espacio: una barra o
+   un "+" agregaría un signo que hay que interpretar. */
+.grafo__marcas__par {
+  display: flex;
+  align-items: center;
+  /* El aire entre las dos marcas, en la proporción del lockup de referencia: ~13% del ancho
+     de COCHA. Es el único separador — una barra o un "+" agregaría un signo que interpretar. */
+  gap: 1.4rem;
+}
+
+/* La marca secundaria del lockup.
+   En el lockup oficial WISER va bastante más chica que COCHA: su altura de mayúscula es
+   ~53% de la del logotipo. A la misma altura que las demás marcas de la lista pesaba igual
+   que COCHA y las dos competían, que es justo lo que un lockup evita. */
+.grafo__marcas__sec {
+  height: 1.1rem !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   La barra de navegación del wapp (lámina del administrador).
+
+   Recreada a partir del `app-shell` real: las nueve secciones, sus iconos y sus tokens.
+   No se volcó del DOM como el administrador porque en la presentación el shell no existe
+   —se quitó a propósito al armar el deck— así que no había de dónde volcarlo.
+
+   Ubica lo que se muestra dentro de la herramienta: sin ella, el administrador se lee como
+   una pantalla suelta y no como una sección de un sistema que además tiene editor,
+   métricas, catálogos y logs.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.wapp-nav {
+  flex: 0 0 auto;
+  background: var(--over-surface);
+  border: 1px solid var(--over-border);
+  border-bottom: 0;
+  border-radius: var(--over-radius) var(--over-radius) 0 0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.wapp-nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+  padding: 1.04rem 1.8rem;
+}
+
+.wapp-nav .brand-group {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.wapp-nav .brand-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--over-radius-sm);
+  background: var(--over-primary-soft);
+  color: var(--over-primary);
+  flex-shrink: 0;
+}
+
+.wapp-nav .brand-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.wapp-nav .brand-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.wapp-nav .brand-title {
+  font-weight: 800;
+  font-size: var(--text-xs);
+  color: var(--over-accent);
+  letter-spacing: -0.01rem;
+}
+
+.wapp-nav .brand-tagline {
+  font-weight: 500;
+  font-size: var(--text-xs);
+  color: var(--over-text-muted);
+}
+
+.wapp-nav .app-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.56rem;
+  flex-wrap: wrap;
+}
+
+/* Las nueve secciones suman bastante ancho: el padding va justo, igual que en el wapp, para
+   que la barra no se parta en dos filas. */
+.wapp-nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 3.76rem;
+  padding-inline: 0.8rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--over-text-muted);
+  border: 1px solid transparent;
+  border-radius: var(--over-radius-sm);
+  white-space: nowrap;
+}
+
+.wapp-nav .nav-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  margin-right: 0.56rem;
+}
+
+.wapp-nav .nav-link-active {
+  background: var(--over-accent);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(30, 58, 95, 0.15);
+}
+
+/* La barra y el administrador son una sola pieza: el marco pierde su esquina superior para
+   que no se vea una costura entre los dos. */
+.lamina--app .marco-app {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Los componentes embebidos no heredan la tipografía del deck.
+
+   El deck define `h1` y `h2` a tamaño de titular de lámina —hasta 96 px— porque están
+   pensados para leerse proyectados desde el fondo de una sala. Los componentes volcados del
+   app (el buscador, el editor) traen sus propios `h1`/`h2` para una pantalla de trabajo, y
+   su hoja no les fija tamaño: el título "Buscador de comisión" salía a 96 px, tres veces lo
+   que mide en la aplicación real.
+
+   Acá vuelven a la escala de la app. Los valores son los de Codex —`--text-*`, con 1rem =
+   10px— así que la UI embebida se ve exactamente como se ve en producción, que es todo el
+   punto de haberla volcado en vez de recrearla.
+   ══════════════════════════════════════════════════════════════════════════ */
+.popup__cuerpo h1,
+.marco-app h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: normal;
+}
+
+.popup__cuerpo h2,
+.marco-app h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: normal;
+}
+
+.popup__cuerpo h3,
+.marco-app h3 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+}

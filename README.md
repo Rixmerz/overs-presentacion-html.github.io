@@ -36,6 +36,33 @@ se avanza la presentación los recorre, y sólo cuando se agotan cambia de lámi
 | **Antes → Después** | el coverflow de catorce condicionados → el formato único → los seis en fila |
 | **Hoja de ruta** | una card por vez: la acerca, y después abre lo suyo (la de disponibilidad muestra además la tarificación encima) |
 
+## El video de la ingesta, montado
+
+La grabación son 56,4 s de pantalla completa a 1600×818, y tiene tres actos:
+
+| Tramo del video | Qué pasa | Velocidad |
+|---|---|---|
+| 0,0 – 9,4 s | elegir el PDF entre los muchos de la carpeta | 3,4× → 2,3× |
+| 9,4 – 38,6 s | Gemini corriendo los seis pasos del pipeline | 3× |
+| 38,6 – 56,4 s | el canvas ya hidratado: bandas, rutas y el PDF real al lado | 0,7× → 1× |
+
+El pipeline se queda en 3×: son 29 s de barras de progreso y a velocidad real la lámina se
+vuelve una espera. Pero el instante en que el canvas aparece relleno baja a 0,7× —es el
+golpe de efecto de la lámina— y todo lo que sigue, que es lo que hay para explicar, corre a
+tiempo real. El loop dura 33 s, de los cuales **19 son el editor ya procesado** (antes eran
+6).
+
+Encima corre el **montaje**: veinticuatro planos que dicen a qué parte del cuadro mirar y
+cuánto acercar — la lista de PDFs, los pasos que van cambiando de estado, las fechas que
+salieron del PDF, la banda con su comisión, las rutas operativas, y al final la tabla del
+editor y la del PDF juntas, con el mismo 4 % en las dos.
+
+Las dos pistas viven en `deck.js`, en las tablas `VELOCIDAD` y `MONTAJE`. Para mover un
+plano se toca una fila —`[tiempo del video, escala, foco x, foco y]`, con el foco en
+fracción del cuadro—; entre fila y fila se interpola. La escala nunca baja de 1 y el
+desplazamiento se recorta a `[1-escala, 0]`: así no aparece borde negro por más pegado al
+costado que esté el foco.
+
 ## Qué se conservó y qué no
 
 El contenido está: los textos, los catorce condicionados reales, el correo, el grafo de la
@@ -61,9 +88,9 @@ La **barra de navegación** de la lámina del administrador es lo único recread
 las nueve secciones reales: en el deck de Angular el shell se había quitado, así que no
 había DOM de dónde volcarla.
 
-## Dos trampas que ya se pagaron
+## Tres trampas que ya se pagaron
 
-Si algo de esto se vuelve a tocar, conviene saberlas — las dos cuestan horas de encontrar:
+Si algo de esto se vuelve a tocar, conviene saberlas — las tres cuestan horas de encontrar:
 
 **Una animación con `fill: both` no se suelta sola.** Sigue imponiendo su último fotograma
 para siempre, incluso terminada. La animación de salida de las láminas deja `opacity: 0`, y
@@ -76,6 +103,16 @@ invisible de forma permanente: compartir pantalla o un clic fuera del navegador 
 la charla alcanzaba. Por lo mismo se descartó la View Transitions API, que directamente
 descarta la transición cuando `visibilityState` no es `visible`, sin avisar. El deck ahora
 sólo arma la entrada con la ventana a la vista y suelta lo que quedó a medias al volver.
+
+**Un montaje escrito en CSS no puede seguir a un video de velocidad variable.** Los
+acercamientos eran una animación de `@keyframes` de duración fija. En cuanto la grabación
+dejó de correr a una sola velocidad, la animación se desfasó en el primer tramo lento, y
+con `loop` el desfase se acumulaba vuelta a vuelta. Ahora el cuadro se recalcula en cada
+frame a partir de `video.currentTime`, que es lo único que se mantiene en fase — y de paso
+un `seek`, un `pause` o volver de una pestaña en segundo plano dejan la imagen correcta
+sin resincronizar nada. Detalle que explica por qué nadie lo había notado: el
+`@keyframes montaje-video` que el CSS invocaba **no existía en ninguna hoja**, así que el
+acercamiento llevaba tiempo sin correr.
 
 ## Los archivos
 

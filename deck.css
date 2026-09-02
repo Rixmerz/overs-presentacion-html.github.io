@@ -1466,8 +1466,12 @@ pre.json {
 }
 
 /* Relleno con `--acento` para que el hito conserve su color; el glifo usa
-   `--acento-sobre`, que es blanco salvo donde el fondo es claro. */
-.grafo__nodo--listo .grafo__marca {
+   `--acento-sobre`, que es blanco salvo donde el fondo es claro.
+   Va también para `--siguiente`: el ✓ marca que esa superficie hace la comprobación, y eso
+   es igual de cierto en la que está por salir que en las que ya están en producción. Lo que
+   separa un estado del otro es el trazo de su arista, no el relleno de la marca. */
+.grafo__nodo--listo .grafo__marca,
+.grafo__nodo--siguiente .grafo__marca {
   background: var(--acento);
   border-color: var(--acento);
   color: var(--acento-sobre);
@@ -1681,12 +1685,19 @@ pre.json {
  * campos del editor —que es lo que la lámina quiere mostrar— no se leen proyectados.
  *
  * En vez de un control que haya que acordarse de apretar, el acercamiento va montado: una
- * secuencia fija de 56 s, el largo exacto de la grabación, que alterna plano general y
- * plano corto. Corre en loop junto con el video, así que la lámina se narra sola.
+ * secuencia de planos generales y planos cortos que corre sola junto con el video.
  *
- * El escalado va en un marco que recorta y no en el `<video>`, para no pelear con la caja
- * que ya lo encuadraba bien: el marco hereda la proporción del medio, así que acercar
- * cambia la escala y nunca el encuadre. */
+ * El montaje NO vive acá. Antes era una animación de CSS y no podía seguir viviendo acá: la
+ * grabación ya no corre a velocidad constante —el tramo de la IA va a 3x y el editor a 1x—
+ * y una animación de duración fija se desfasa del video en cuanto la velocidad cambia. Los
+ * acercamientos los calcula `deck.js` cuadro a cuadro a partir de `video.currentTime`
+ * (tablas `VELOCIDAD` y `MONTAJE`), que es lo único que se mantiene en fase. Acá quedan
+ * sólo las dos cosas que ese cálculo da por sentadas: el origen de la transformación en la
+ * esquina y el aviso al compositor.
+ *
+ * El marco que recorta es el `.video-zoom`, no el `<video>`, para no pelear con la caja que
+ * ya lo encuadraba bien: el marco hereda la proporción del medio, así que acercar cambia la
+ * escala y nunca el encuadre. */
 .video-zoom {
   flex: 1 1 auto;
   align-self: center;
@@ -1711,14 +1722,21 @@ pre.json {
   border: 0;
   border-radius: 0;
   box-shadow: none;
-  animation: montaje-video 18.8s ease-in-out infinite;
+  /* El `translate`/`scale` que escribe `deck.js` se apoya en este origen: con la esquina
+     como referencia, desplazar un -x% mueve exactamente esa fracción del cuadro. */
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 /* Quien pidió menos movimiento ve el video entero y quieto, que es la lámina completa: el
-   acercamiento agrega legibilidad, no contenido. */
+   acercamiento agrega legibilidad, no contenido. La velocidad sí se respeta: no es
+   movimiento en la pantalla, es cuánto dura cada acto.
+   `!important` porque el montaje escribe `transform` en el atributo `style`, y una regla
+   normal de hoja de estilos pierde contra el inline. `deck.js` además comprueba lo mismo y
+   ni siquiera lo escribe; esto es el cinturón del cinturón. */
 @media (prefers-reduced-motion: reduce) {
   .video-zoom .video {
-    animation: none;
+    transform: none !important;
   }
 }
 
@@ -2515,15 +2533,32 @@ pre.json {
    como que la primera cambió, no como que apareció algo sobre ella.
    ══════════════════════════════════════════════════════════════════════════ */
 
-.visor__sobre {
+/* `.visor__hoja .visor__sobre` y no `.visor__sobre` a secas.
+   Dos clases (0,2,0) para ganarle a `.visor__hoja img` (0,1,1), que fija `width: auto` y
+   `max-width: 100%`. Con un solo selector de clase esta regla PERDÍA: el `width` de acá no
+   se aplicaba nunca y la hoja de encima se dibujaba al ancho completo del contenedor —más
+   ancha que la hoja de abajo, que se ajusta por alto y queda con margen a los costados—.
+   Se veía como una imagen enorme y descentrada, y el `box-shadow` propio tampoco entraba. */
+.visor__hoja .visor__sobre {
   position: absolute;
   /* Anclada al centro de la hoja y desde ahí corrida: así el desfase no depende del tamaño
      que el navegador le haya dado a la hoja de abajo. */
   left: 50%;
   top: 50%;
-  width: 78%;
+  /* 68% y no 78%: la hoja de abajo casi nunca ocupa el ancho completo del contenedor —se
+     ajusta por alto y queda con margen a los costados—, así que una hoja de encima al 78%
+     con el desfase a la derecha se salía por fuera de la de abajo y se leía como un error
+     de tamaño en vez de como algo apoyado encima. Al 68% queda contenida con aire a los dos
+     lados por más ancha que sea la imagen. */
+  width: 68%;
   height: auto;
-  transform: translate(-38%, -34%);
+  /* Techo por si la pantalla es muy ancha y baja: con `width` fijo y `height: auto`, el
+     `max-height` reduce el alto Y el ancho de forma proporcional, no deforma. */
+  max-height: calc((100dvh - 9rem) * 0.66);
+  /* El desfase se achicó junto con el ancho: el centro de la hoja de encima queda al 54% del
+     contenedor en vez del 59%. Alcanza para que se lea como una segunda cosa apoyada sobre
+     la primera, sin que parezca descentrada. */
+  transform: translate(-46%, -44%);
   border-radius: var(--over-radius-sm);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
   /* Entra desde abajo y a la derecha, como algo que se posa sobre la pantalla. */
@@ -2543,7 +2578,7 @@ pre.json {
 }
 
 .visor__hoja:not(.visor__hoja--sobre) .visor__sobre {
-  transform: translate(-30%, -22%) scale(0.96);
+  transform: translate(-40%, -34%) scale(0.96);
 }
 
 /* Mientras hay una hoja encima, la de abajo se atenúa un poco: sigue dando contexto pero

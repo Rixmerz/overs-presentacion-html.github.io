@@ -307,30 +307,165 @@
     // El video arrancaba solo al aparecer la lámina y se destruía al salir. Con todas las
     // láminas en el DOM hay que hacerlo explícito, o sigue corriendo por detrás.
     if (video) {
-      if (laminas[indice].id === 'ingesta') void video.play().catch(() => {});
-      else video.pause();
+      if (laminas[indice].id === 'ingesta') {
+        void video.play().catch(() => {});
+        arrancarMontaje();
+      } else {
+        video.pause();
+        pararMontaje();
+      }
     }
   }
 
-  /* El video corre a 3x.
+  /* ── lámina 4: el montaje del video ───────────────────────────────────────
    *
-   * Son 56 segundos de una grabacion de pantalla: a velocidad normal la lamina se queda
-   * quieta demasiado tiempo y hay que narrar sobre esperas. A 3x el pipeline completo pasa
-   * en menos de 19 segundos y se lee como un proceso, no como una espera.
+   * La grabación son 56.4 s de pantalla completa a 1600x818 y tiene tres actos, medidos
+   * cuadro a cuadro sobre el archivo:
    *
-   * Se vuelve a fijar en cada `play` porque algunos navegadores devuelven `playbackRate` a
-   * 1 al cargar metadatos o al reiniciar el loop, y el montaje del CSS —que dura
-   * exactamente 56.4/3 segundos— quedaria desfasado del video. */
-  const VELOCIDAD = 3;
+   *     0.0 – 9.4 s   elegir el PDF entre los muchos de la carpeta
+   *     9.4 – 38.6 s  Gemini corriendo los seis pasos del pipeline
+   *    38.6 – 56.4 s  el canvas ya hidratado: bandas, rutas y el PDF real al lado
+   *
+   * Sobre eso corren dos pistas, las dos indexadas por el tiempo del MEDIO
+   * (`video.currentTime`) y no por un reloj propio:
+   *
+   *   · `VELOCIDAD` — la rampa. El tramo de la IA se queda en 3x: son 26 s de barras de
+   *     progreso y a 1x la lámina se convierte en una espera. Pero el instante en que el
+   *     canvas aparece relleno baja a 0.7x —el golpe de efecto de la lámina merece verse— y
+   *     todo lo que sigue, que es lo que hay para explicar, corre a 1x o algo por debajo.
+   *     Entre punto y punto la velocidad se interpola: un corte seco de 3x a 1x se ve como
+   *     un tirón, la rampa se lee como una desaceleración.
+   *
+   *   · `MONTAJE` — los acercamientos. Proyectada, la grabación entera deja legible el
+   *     flujo pero no los campos del editor, que es justo lo que la lámina quiere mostrar.
+   *     Cada punto dice a qué parte del cuadro mirar y cuánto acercar.
+   *
+   * Indexar por `currentTime` en vez de por una animación de CSS no es un detalle de
+   * estilo, es lo único que funciona: con la velocidad variable, cualquier animación de
+   * duración fija se desfasa al primer tramo lento, y con `loop` el desfase se acumula
+   * vuelta a vuelta. Acá el cuadro se recalcula de cero en cada frame a partir del tiempo
+   * del video, así que un `seek`, un `pause` o volver de una pestaña en segundo plano
+   * dejan la imagen correcta sin que haya que resincronizar nada. Por lo mismo no hay
+   * ninguna `transition` en juego: las transiciones se congelan con la pestaña oculta y
+   * retienen el valor viejo — el bug que ya nos costó las láminas en blanco. */
 
-  if (video) {
-    const acelerar = () => {
-      video.playbackRate = VELOCIDAD;
-      video.defaultPlaybackRate = VELOCIDAD;
-    };
-    acelerar();
-    ['loadedmetadata', 'play', 'seeked'].forEach((e) => video.addEventListener(e, acelerar));
+  /** [t del video, velocidad]. Se interpola entre puntos. */
+  const VELOCIDAD = [
+    [0.0, 3.4],   // el picker: recorrer la carpeta es contexto, no contenido
+    [5.4, 3.4],
+    [6.6, 2.3],   // frena para que se lea el archivo que se elige
+    [9.3, 2.3],
+    [10.0, 2.8],
+    [12.0, 3.0],  // el pipeline, a la velocidad que ya tenía
+    [35.4, 3.0],
+    [36.6, 1.7],
+    [38.2, 0.85],
+    [38.9, 0.7],  // el canvas hidratado aparece acá: cámara lenta
+    [40.0, 0.9],
+    [41.0, 1.0],  // de acá al final, tiempo real
+    [47.6, 1.0],
+    [48.4, 0.9],
+    [51.2, 1.0],
+    [52.4, 0.9],
+    [56.4, 0.9]
+  ];
+
+  /** [t del video, escala, foco x, foco y]. El foco va en fracción del cuadro. */
+  const MONTAJE = [
+    [0.0, 1.0, 0.5, 0.5],      // plano general: la aplicación entera
+    [1.8, 1.48, 0.42, 0.42],   // la lista de PDFs — una aerolínea por archivo
+    [8.4, 1.48, 0.42, 0.47],   // acompaña el scroll de la lista
+    [9.3, 1.62, 0.48, 0.52],   // el Turkish elegido, y el botón Abrir
+    [10.4, 1.0, 0.5, 0.5],     // afuera: se abre el canvas vacío
+    [12.6, 1.58, 0.5, 0.58],   // adentro del panel del pipeline
+    [20.0, 1.58, 0.5, 0.52],   // sube al encabezado: el paso y el porcentaje
+    [28.0, 1.72, 0.5, 0.62],   // los pasos que van cambiando de estado
+    [34.8, 1.72, 0.5, 0.7],    // baja a los dos últimos
+    [37.4, 1.32, 0.5, 0.62],   // abre: los seis en LISTO
+    [38.5, 1.0, 0.5, 0.5],     // plano general JUSTO antes del relleno
+    [39.9, 1.0, 0.5, 0.5],     // y lo sostiene: canvas y PDF, lado a lado
+    [40.5, 1.62, 0.31, 0.47],  // las fechas y el nombre que salieron del PDF
+    [41.5, 1.62, 0.33, 0.62],  // baja por PTC, tour/account code y columnas
+    [42.8, 1.7, 0.35, 0.7],    // la banda entera: de la RUTA a su COMISIÓN
+    [44.2, 1.7, 0.35, 0.72],
+    [44.9, 1.24, 0.33, 0.64],  // abre a las rutas operativas origen/destino
+    [47.4, 1.24, 0.33, 0.64],
+    [48.4, 1.12, 0.5, 0.55],   // afloja mientras la página vuelve arriba
+    [49.8, 1.39, 0.7, 0.64],   // tabla y PDF juntos: el mismo 4% en los dos
+    [50.5, 1.39, 0.7, 0.64],
+    [51.1, 1.0, 0.5, 0.5],     // afuera: se abre el PDF real
+    [52.8, 1.48, 0.6, 0.66],   // la tabla del PDF, que es la fuente de todo
+    [55.6, 1.48, 0.6, 0.3],    // sube al encabezado: Turkish y el periodo
+    [56.4, 1.0, 0.5, 0.5]      // cierra en general para que el loop no salte
+  ];
+
+  /** Arranque y frenada suaves: sin esto cada movimiento empieza y termina de golpe. */
+  const suave = (k) => k * k * (3 - 2 * k);
+
+  /** El tramo de `tabla` que contiene `t`, y cuánto se avanzó dentro de él. */
+  function tramo(tabla, t) {
+    let i = 0;
+    while (i < tabla.length - 1 && t >= tabla[i + 1][0]) i++;
+    const a = tabla[i];
+    const b = tabla[Math.min(i + 1, tabla.length - 1)];
+    const largo = b[0] - a[0];
+    return { a, b, k: largo > 0 ? Math.min(1, Math.max(0, (t - a[0]) / largo)) : 1 };
   }
+
+  const quietoVideo = matchMedia('(prefers-reduced-motion: reduce)');
+
+  function cuadroMontaje() {
+    if (!video) return;
+    const t = video.currentTime;
+
+    const v = tramo(VELOCIDAD, t);
+    const vel = v.a[1] + (v.b[1] - v.a[1]) * suave(v.k);
+    /* Sólo se escribe cuando cambia de verdad: asignar `playbackRate` en cada frame dispara
+       `ratechange` sesenta veces por segundo para nada. El efecto colateral bueno es que
+       también repara el 3x que algunos navegadores devuelven a 1 al reiniciar el loop, que
+       antes había que atajar a mano con tres listeners. */
+    if (Math.abs(video.playbackRate - vel) > 0.01) video.playbackRate = vel;
+
+    if (quietoVideo.matches) {
+      video.style.transform = '';
+      return;
+    }
+
+    const m = tramo(MONTAJE, t);
+    const k = suave(m.k);
+    const s = m.a[1] + (m.b[1] - m.a[1]) * k;
+    const fx = m.a[2] + (m.b[2] - m.a[2]) * k;
+    const fy = m.a[3] + (m.b[3] - m.a[3]) * k;
+    /* Con `transform-origin: 0 0` y el desplazamiento en % del propio elemento, el punto
+     * (fx, fy) del cuadro cae en el centro del marco. El recorte a [1-s, 0] es lo que evita
+     * el borde negro cuando el foco está pegado a un costado: más allá de ahí el video
+     * dejaría de cubrir el marco. Con escala >= 1 nunca hay hueco. */
+    const tope = (u) => Math.min(0, Math.max(1 - s, u));
+    const tx = (tope(0.5 - s * fx) * 100).toFixed(3);
+    const ty = (tope(0.5 - s * fy) * 100).toFixed(3);
+    video.style.transform = `translate(${tx}%, ${ty}%) scale(${s.toFixed(4)})`;
+  }
+
+  let lazoMontaje = 0;
+
+  function arrancarMontaje() {
+    if (!video || lazoMontaje) return;
+    const paso = () => {
+      cuadroMontaje();
+      lazoMontaje = requestAnimationFrame(paso);
+    };
+    lazoMontaje = requestAnimationFrame(paso);
+  }
+
+  function pararMontaje() {
+    if (!lazoMontaje) return;
+    cancelAnimationFrame(lazoMontaje);
+    lazoMontaje = 0;
+  }
+
+  // Deja el primer cuadro puesto aunque la lámina todavía no se haya visitado: si no, el
+  // póster se ve a escala 1 y el video entra con un salto la primera vez.
+  if (video) cuadroMontaje();
 
   /* ── visor a pantalla completa ──────────────────────────────────────── */
 

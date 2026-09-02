@@ -30,7 +30,7 @@
       <section class="lamina portada" data-id="portada" data-titulo="Portada" data-oscura="true">
         <img class="logo logo--portada" src="assets/cocha-logo-blanco.png" alt="COCHA" />
         <h1>Proyecto <em>OVER</em></h1>
-        <p class="bajada">La sobrecomisión, detectada en el momento de la venta.</p>
+        <p class="bajada">Sobrecomisión detectada en el momento de la venta.</p>
         <dl class="creditos">
           <div>
             <dt>Product Owners</dt>
@@ -67,7 +67,7 @@
             <span>Retorna las tres opciones de aerolínea con mayor rentabilidad.</span>
           </div>
           <div class="comos__i">
-            <strong>Avisa sin que nadie lo pida</strong>
+            <strong>Avisa sin que nadie lo solicite</strong>
             <span>La alerta se envía inicialmente a través de un correo, entregándole la información al vendedor de forma automática.</span>
           </div>
         </div>
@@ -272,10 +272,11 @@
              `deck.js` lo arranca al entrar a esta lámina y lo pausa al salir. -->
         <!-- El video va dentro de un marco que recorta, para poder acercarlo.
              Proyectado, la grabacion es de pantalla completa y el detalle del editor no se
-             alcanza a leer desde el fondo de la sala. Dos cosas lo resuelven, y las dos
-             viven en el marco y no en el <video>, para no pelear con sus controles:
-             un acercamiento lento y continuo mientras corre, y un zoom manual —el boton de
-             la lupa— que sigue al mouse para detenerse en un detalle al narrar. -->
+             alcanza a leer desde el fondo de la sala. Lo resuelve un montaje: `deck.js`
+             calcula cuadro a cuadro, a partir de `video.currentTime`, cuanto acercar y a
+             que parte mirar (tabla `MONTAJE`), y ademas cambia la velocidad (tabla
+             `VELOCIDAD`) — el tramo de la IA sigue a 3x y el editor ya relleno baja a 1x.
+             No hay ningun control que apretar: la lamina se narra sola. -->
         <div class="video-zoom">
           <!-- Sin `controls`: la barra de reproduccion, el volumen y el boton de pantalla completa
                son de un reproductor, no de una lamina — y ademas tapaban la franja inferior
@@ -447,7 +448,7 @@
         <div class="grafo">
           <svg class="grafo__lineas" viewBox="0 0 1000 560" preserveAspectRatio="none" aria-hidden="true">
             <line class="grafo__arista grafo__arista--listo" style="--i: 0" x1="500" y1="280" x2="170" y2="112" />
-            <line class="grafo__arista grafo__arista--listo" style="--i: 1" x1="500" y1="280" x2="170" y2="448" />
+            <line class="grafo__arista grafo__arista--siguiente" style="--i: 1" x1="500" y1="280" x2="170" y2="448" />
             <line class="grafo__arista grafo__arista--siguiente" style="--i: 2" x1="500" y1="280" x2="830" y2="112" />
             <line class="grafo__arista grafo__arista--futuro" style="--i: 3" x1="500" y1="280" x2="830" y2="448" />
           </svg>
@@ -496,7 +497,10 @@
 
           <div class="grafo__nodo grafo__nodo--siguiente grafo__nodo--c-amarillo" style="--x: 83%; --y: 20%; --i: 2">
             <div class="grafo__cab">
-              <span class="grafo__marca" aria-hidden="true"></span>
+              <!-- Lleva el ✓ igual que los hitos en producción: esta superficie también hace
+                   la comprobación. Lo que la distingue es el estado del nodo —`--siguiente`,
+                   no `--listo`—, que deja el círculo calado en vez de relleno. -->
+              <span class="grafo__marca" aria-hidden="true">✓</span>
               <strong>Top 3 de aerolíneas con mayor over en disponibilidad/tarificar</strong>
             </div>
             <span class="grafo__linea">Alerta de aerolíneas con mayor over en tarificación</span>

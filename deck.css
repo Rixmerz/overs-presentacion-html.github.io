@@ -2545,20 +2545,27 @@ pre.json {
      que el navegador le haya dado a la hoja de abajo. */
   left: 50%;
   top: 50%;
-  /* 68% y no 78%: la hoja de abajo casi nunca ocupa el ancho completo del contenedor —se
-     ajusta por alto y queda con margen a los costados—, así que una hoja de encima al 78%
-     con el desfase a la derecha se salía por fuera de la de abajo y se leía como un error
-     de tamaño en vez de como algo apoyado encima. Al 68% queda contenida con aire a los dos
-     lados por más ancha que sea la imagen. */
-  width: 68%;
-  height: auto;
-  /* Techo por si la pantalla es muy ancha y baja: con `width` fijo y `height: auto`, el
-     `max-height` reduce el alto Y el ancho de forma proporcional, no deforma. */
-  max-height: calc((100dvh - 9rem) * 0.66);
-  /* El desfase se achicó junto con el ancho: el centro de la hoja de encima queda al 54% del
-     contenedor en vez del 59%. Alcanza para que se lea como una segunda cosa apoyada sobre
-     la primera, sin que parezca descentrada. */
-  transform: translate(-46%, -44%);
+  /* Se dimensiona con las MISMAS dos restricciones que la hoja de abajo (`.visor__hoja img`)
+     y no con un porcentaje fijo del contenedor. Ese era el error de fondo: un `width: 68%`
+     del contenedor y una hoja de abajo que se ajusta por ALTO dan un tamaño relativo que
+     cambia con la proporción de la ventana — por eso la misma regla se veía «demasiado
+     grande» en una pantalla y «demasiado chica» en otra.
+
+     Con `width: auto` más los dos topes, gana el que corresponda según la ventana y la
+     imagen siempre sale lo más grande que entra, conservando su proporción. El 96% deja un
+     borde mínimo para que se note que hay algo debajo.
+
+     Esta imagen es más ancha que la de abajo (2.38 contra 1.68), así que a esta escala se
+     pasa de los costados de la otra. Es a propósito: centrada y sobresaliendo parejo se lee
+     como una segunda pantalla apoyada encima; el problema anterior no era el tamaño sino que
+     sobresalía SOLO por la derecha. */
+  width: auto;
+  max-width: 96%;
+  max-height: calc((100dvh - 9rem) * 0.96);
+  /* Centrada de verdad —`-50%, -50%`— y después un empujón mínimo: 1% de su ancho a la
+     derecha y 3% de su alto abajo. Alcanza para que se lea apoyada encima y no como si la
+     de abajo hubiera cambiado, sin que parezca descentrada. */
+  transform: translate(-49%, -47%);
   border-radius: var(--over-radius-sm);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
   /* Entra desde abajo y a la derecha, como algo que se posa sobre la pantalla. */
@@ -2578,7 +2585,7 @@ pre.json {
 }
 
 .visor__hoja:not(.visor__hoja--sobre) .visor__sobre {
-  transform: translate(-40%, -34%) scale(0.96);
+  transform: translate(-45%, -41%) scale(0.94);
 }
 
 /* Mientras hay una hoja encima, la de abajo se atenúa un poco: sigue dando contexto pero

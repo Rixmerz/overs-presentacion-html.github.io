@@ -609,6 +609,16 @@ h2 {
   max-width: 78ch;
 }
 
+/* La bajada de la hoja de ruta vive DENTRO de la cabecera, que es un flex con
+   `align-items: flex-end`: sin un respiro arriba queda pegada al titular, y la leyenda de la
+   derecha se alinea contra el borde de abajo del bloque entero. Un poco más angosta que las
+   otras para que no empuje a la leyenda a otra línea. */
+.bajada--ruta {
+  margin-top: 0.8rem;
+  max-width: 52ch;
+  font-size: clamp(1.4rem, 1.25vw, 1.8rem);
+}
+
 /* ── visor de PDF a pantalla completa ─────────────────────────────── */
 .visor {
   position: fixed;

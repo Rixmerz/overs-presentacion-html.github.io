@@ -256,7 +256,7 @@
         <header class="cabecera cabecera--video">
           <div>
             <p class="epigrafe">Interacción IA con Humano</p>
-            <h2>Nada se publica sin que<br />alguien lo apruebe.</h2>
+            <h2>Interpretación de documentos con IA</h2>
           </div>
           <ol class="etapas">
             <li><span class="etapas__n">1</span>Extrae el texto del PDF</li>
@@ -373,16 +373,20 @@
              aerolinea" y "14.510 PNRs distintos" eran datos ciertos pero sin lugar en el
              relato, y obligaban a la audiencia a construir sola la proporcion.
 
-             Las tres etapas de aca SI son un embudo real —cada una es subconjunto de la
+             Las etapas de aca SI son un embudo real —cada una es subconjunto de la
              anterior— y explican de donde sale el numero de abajo: de 17.992 reservas
-             procesadas salieron 3.296 alertas, y 2.765 de esas eran una oportunidad que no
-             se tomo. Es la misma informacion, contada en el orden en que ocurre.
+             procesadas salieron 3.296 alertas. Es la misma informacion, contada en el orden
+             en que ocurre.
 
              Forma "emphasis" (una barra en el acento, el resto en gris de retroceso): la
-             tercera etapa es el punto, las dos primeras son contexto. No es una paleta
-             categorica — tres rojos consecutivos fallan la separacion visual incluso con
-             vision normal (dE 7.8), asi que el color no distingue etapas: lo hace el largo
-             de la barra y su valor escrito al final. -->
+             ultima etapa es el punto, la primera es contexto. No es una paleta categorica —
+             rojos consecutivos fallan la separacion visual incluso con vision normal
+             (dE 7.8), asi que el color no distingue etapas: lo hace el largo de la barra y
+             su valor escrito al final.
+
+             Habia una tercera etapa —"Con mejor over sin tomar", 2.765 / 15%— que se saco a
+             pedido. El `--foco` vivia ahi: al quitarla hubo que moverlo a "Con alerta
+             enviada", o el grafico quedaba entero en gris y sin barra de acento. -->
         <figure class="embudo">
           <figcaption class="embudo__t">De la reserva a la oportunidad</figcaption>
           <ol class="embudo__l">
@@ -391,15 +395,10 @@
               <span class="embudo__barra"><i></i></span>
               <span class="embudo__v"><b>17.992</b><em>100%</em></span>
             </li>
-            <li class="embudo__f" style="--pct: 18.3">
+            <li class="embudo__f embudo__f--foco" style="--pct: 18.3">
               <span class="embudo__k"><span class="mi" aria-hidden="true">mail</span>Con alerta enviada</span>
               <span class="embudo__barra"><i></i></span>
               <span class="embudo__v"><b>3.296</b><em>18%</em></span>
-            </li>
-            <li class="embudo__f embudo__f--foco" style="--pct: 15.4">
-              <span class="embudo__k"><span class="mi" aria-hidden="true">savings</span>Con mejor over sin tomar</span>
-              <span class="embudo__barra"><i></i></span>
-              <span class="embudo__v"><b>2.765</b><em>15%</em></span>
             </li>
           </ol>
           <p class="embudo__nota">

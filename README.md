@@ -88,9 +88,9 @@ La **barra de navegación** de la lámina del administrador es lo único recread
 las nueve secciones reales: en el deck de Angular el shell se había quitado, así que no
 había DOM de dónde volcarla.
 
-## Tres trampas que ya se pagaron
+## Cuatro trampas que ya se pagaron
 
-Si algo de esto se vuelve a tocar, conviene saberlas — las tres cuestan horas de encontrar:
+Si algo de esto se vuelve a tocar, conviene saberlas — las cuatro cuestan horas de encontrar:
 
 **Una animación con `fill: both` no se suelta sola.** Sigue imponiendo su último fotograma
 para siempre, incluso terminada. La animación de salida de las láminas deja `opacity: 0`, y
@@ -113,6 +113,24 @@ un `seek`, un `pause` o volver de una pestaña en segundo plano dejan la imagen 
 sin resincronizar nada. Detalle que explica por qué nadie lo había notado: el
 `@keyframes montaje-video` que el CSS invocaba **no existía en ninguna hoja**, así que el
 acercamiento llevaba tiempo sin correr.
+
+**`loading="lazy"` acá carga MÁS tarde, no antes.** Las veinte imágenes de la lámina de
+estandarización lo traían. El deck tiene todas las láminas en el DOM con `hidden`, y una
+imagen oculta no está «cerca del viewport»: el navegador no la baja hasta que la lámina
+aparece, o sea justo cuando hay que verla. Medido con la portada activa y la página cargada
+hace rato: **0 de 20 bajadas**. Como las fichas del coverflow tienen tamaño propio
+(`.doc3d` es absoluta con `inset: 0`) y fondo blanco, no había salto de layout — se veían
+catorce hojas en blanco. Sin el atributo: 20 de 20 en ~250 ms. El atributo resuelve el
+problema de una página larga con scroll, que no es el de un deck de ocho láminas que se
+recorre entero; la carga se dirige desde `deck.js` (`precargar`), que además decodifica con
+`decode()` y ordena por cercanía a la lámina actual.
+
+Ojo con dos cosas al verificar esto: `requestIdleCallback` **no dispara con la pestaña
+oculta** —ni con su `timeout`, igual que las animaciones—, por eso la precarga lleva un
+`setTimeout` de respaldo; y el navegador cachea `deck.js` y `deck.css`, que se referencian
+sin `?v=`, así que recargar el HTML con un query no alcanza para probar un cambio en el JS
+(`transferSize: 0` en `performance.getEntriesByType('resource')` lo delata). Lo más rápido
+es levantar el servidor en otro puerto.
 
 ## Los archivos
 

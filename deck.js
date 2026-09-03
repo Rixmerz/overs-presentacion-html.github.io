@@ -47,11 +47,138 @@
      * caso de "avanzar varias y volver" y el de "retroceder y después avanzar". */
     const anterior = laminas[indice].el;
     indice = siguiente;
+    /* Si la precarga de fondo todavía no llegó a esta lámina, se le adelanta acá: la
+       navegación reordena la cola por la lámina nueva. */
+    if (imagenesDe(indice).length) void alistarTodas(imagenesDe(indice));
     // `replaceState` y no `location.hash`: avanzar diez láminas dejaba diez entradas en el
     // historial, y el botón atrás del navegador no salía nunca de la presentación.
     history.replaceState(null, '', `${location.pathname}${location.search}#${laminas[indice].id}`);
     transicion(anterior, atras);
   }
+
+  /* ── precarga de imágenes ─────────────────────────────────────────────────
+   *
+   * Las veinte imágenes de la lámina de estandarización traían `loading="lazy"`, y acá ese
+   * atributo hacía justo lo contrario de lo que promete. El deck tiene TODAS las láminas en
+   * el DOM con `hidden`: una imagen oculta no está «cerca del viewport», así que el
+   * navegador no la baja hasta que la lámina aparece — o sea, justo cuando ya hay que
+   * verla. Medido con la portada activa y la página cargada hace rato: 0 de 20 bajadas. Las
+   * fichas del coverflow tienen fondo blanco y tamaño propio (`.doc3d` es absoluta con
+   * `inset: 0`), así que no había salto de layout: se veían catorce hojas EN BLANCO.
+   *
+   * `lazy` resuelve el problema de una página larga con scroll, que no es el caso de un
+   * deck de ocho láminas que se recorre entero. Se quitó el atributo y la carga se dirige
+   * desde acá, que además permite tres cosas que el atributo no da:
+   *
+   *   · **Orden por cercanía.** Primero la lámina actual, después las vecinas, después el
+   *     resto. Lo que se va a ver en la próxima flecha llega primero.
+   *   · **`decode()`.** Descargada no es lo mismo que lista: decodificar un JPEG grande en
+   *     el momento de mostrarlo produce el mismo tirón que no tenerlo. Acá se decodifica
+   *     antes, fuera del cuadro en que se muestra.
+   *   · **No depende de que se esté renderizando.** El observador del `lazy` necesita que
+   *     el navegador pinte; con la pestaña en segundo plano no dispara nunca (mismo motivo
+   *     por el que las animaciones se congelan y hubo que atajarlo en `transicion`).
+   *     Una descarga por JS no tiene esa condición.
+   *
+   * Corre después del `load` y en `requestIdleCallback`, así que no compite con el primer
+   * pintado ni con el video de la ingesta. */
+
+  const TANDA = 4;
+
+  /** Descarga y decodifica una imagen. Nunca rechaza: una imagen que falta no puede romper
+   *  la cadena de precarga ni dejar la promesa colgada. */
+  function alistar(img) {
+    if (img.dataset.lista) return Promise.resolve();
+    const fuente = img.currentSrc || img.getAttribute('src');
+    if (!fuente) return Promise.resolve();
+    const marcar = () => {
+      img.dataset.lista = 'si';
+    };
+    /* `decode()` sobre el propio `<img>` del documento: así se aprovecha la misma entrada de
+       caché que va a usar al mostrarse, en vez de bajarla dos veces con un `new Image()`. */
+    if (img.complete && img.naturalWidth) {
+      marcar();
+      return Promise.resolve();
+    }
+    const decodificar = typeof img.decode === 'function' ? () => img.decode() : () => Promise.resolve();
+    return decodificar().then(marcar, () => {
+      /* `decode()` rechaza si la imagen todavía no tiene datos o si falló. Se cae al evento
+         clásico, con tope de tiempo para no dejar la tanda esperando a un 404. */
+      return new Promise((listo) => {
+        let cerrado = false;
+        const fin = () => {
+          if (cerrado) return;
+          cerrado = true;
+          marcar();
+          listo();
+        };
+        img.addEventListener('load', fin, { once: true });
+        img.addEventListener('error', fin, { once: true });
+        setTimeout(fin, 8000);
+      });
+    });
+  }
+
+  /** Las imágenes de una lámina, las que faltan primero. */
+  function imagenesDe(i) {
+    const l = laminas[i];
+    if (!l) return [];
+    return [...l.el.querySelectorAll('img[src]')].filter((img) => !img.dataset.lista);
+  }
+
+  /** De a `TANDA`, para no abrir veinte conexiones de golpe: en HTTP/1.1 el navegador sólo
+   *  da seis por origen y las últimas quedarían encoladas detrás de las que no urgen. */
+  async function alistarTodas(imgs) {
+    for (let i = 0; i < imgs.length; i += TANDA) {
+      await Promise.all(imgs.slice(i, i + TANDA).map(alistar));
+    }
+  }
+
+  /** Las láminas ordenadas por distancia a `desde`: la de al lado antes que la del final. */
+  function porCercania(desde) {
+    return laminas
+      .map((_, i) => i)
+      .sort((a, b) => Math.abs(a - desde) - Math.abs(b - desde) || a - b);
+  }
+
+  let precargaEnCurso = false;
+
+  /** Precarga todo el deck, empezando por lo que está a punto de verse. Es idempotente:
+   *  `dataset.lista` hace que una segunda pasada no vuelva a pedir nada. */
+  async function precargar(desde) {
+    if (precargaEnCurso) return;
+    precargaEnCurso = true;
+    try {
+      for (const i of porCercania(desde)) {
+        await alistarTodas(imagenesDe(i));
+      }
+    } finally {
+      precargaEnCurso = false;
+    }
+  }
+
+  /* `requestIdleCallback` **más** un `setTimeout` de respaldo, y no sólo el primero.
+   *
+   * Medido: con `visibilityState === 'hidden'` el idle callback no dispara nunca, ni con su
+   * `timeout` puesto — la misma razón por la que se congelan las animaciones y por la que se
+   * descartó la View Transitions API. Y «oculta» acá no es un caso raro: una presentación
+   * vive en pantalla compartida y en segundo monitor. Sin el respaldo, la precarga no corría
+   * justo en el escenario para el que existe.
+   *
+   * Dispara el que llegue primero; el otro encuentra todo con `dataset.lista` y no pide
+   * nada. `precargaEnCurso` cubre el solape si caen juntos. */
+  function arrancarPrecarga() {
+    const desde = indice;
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(() => precargar(desde), { timeout: 1500 });
+    }
+    setTimeout(() => precargar(desde), 1200);
+  }
+
+  /* Al `load` y no al `DOMContentLoaded`: en ese punto el primer pintado ya ocurrió y la
+     precarga no le compite. */
+  if (document.readyState === 'complete') arrancarPrecarga();
+  else addEventListener('load', arrancarPrecarga, { once: true });
 
   /* ── el cambio de lámina, como transformación ────────────────────────────
    *
